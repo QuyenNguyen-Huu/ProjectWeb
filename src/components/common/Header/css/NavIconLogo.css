@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+/* ===== Global ===== */
+a {
+    @apply cursor-pointer no-underline text-[#333333] transition-all duration-300 ease-in-out focus:outline-none;
+}
+
+.fa {
+    @apply inline-block antialiased text-inherit cursor-pointer;
+    font: normal normal normal 14px/1 FontAwesome;
+}
+
+/* ===== Header ===== */
+.header {
+    @apply fixed top-0 left-0 text-[#333] w-full h-[217px] bg-white z-50 transition-transform duration-500 ease-in-out;
+}
+
+.header-main {
+    /* Base */
+    @apply relative z-50 table w-full bg-white pl-0 pr-0;
+
+    /* Responsive */
+    @apply max-md:flex max-md:items-end;
+    @apply md:pl-[20px] md:pr-[20px];
+    @apply lg:pl-[50px] lg:pr-[50px];
+    @apply xl:pl-[40px] xl:pr-[40px];
+}
+
+/* ===== Logo ===== */
+.logo {
+    /* Base */
+    @apply flex items-center px-0 py-[5px] mr-0 text-left;
+
+    /* Responsive */
+    @apply max-md:w-[130px] md:py-[27px] max-md:ml-[22%];
+}
+
+.logo a {
+    /* Base */
+    @apply block w-auto mt-0 text-left;
+
+    /* Responsive */
+    @apply md:w-[180px];
+}
+
+.logo a img {
+    /* Base */
+    @apply h-auto max-h-[40px] lg:max-h-[70px] w-auto;
+}
+
+/* ===== Navigation ===== */
+.nav-list {
+    @apply flex list-none m-0 p-0;
+}
+
+.nav-list li {
+    /* Base */
+    @apply mt-[20px] mx-[11px] mb-0 align-middle;
+
+    /* Responsive */
+    @apply max-md:m-0 max-md:p-3.5
+}
+
+.nav-list li a {
+    @apply relative;
+}
+
+/* ===== Search Form ===== */
+.form {
+    @apply relative w-[270px] border border-[#e1e1e1] text-[14px] mb-[30px];
+}
+
+.form input {
+    @apply w-full max-w-full p-[10px] py-[5px];
+}
+
+.form-button {
+    @apply absolute right-0 px-1.5 text-[18px] bg-transparent border-none;
+}
+
+/* ===== Sidebar Icon ===== */
+.sidebar-icon-nav {
+    /* Base */
+    @apply ml-0 -mr-3 inline-block text-[18px];
+    /* Responsive */
+    @apply max-md:mr-0;
+}
+
+/* ===== Cart ===== */
+.cart-title {
+    @apply absolute -right-[16px] -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#F44336] text-white overflow-hidden;
+}
+
+.cart-count {
+    @apply text-[12px];
+}
+
+/* ==== Mobile ==== */
+.gobal-style {
+    /* Base */
+    @apply w-auto flex justify-between mr-0;
+    /* Responsive */
+    @apply max-md:mr-2 max-md:items-center max-md:w-[85%];
+}
+
+.warp {
+    max-height: 0;
+    overflow: hidden;
+}
+
+.warp-open {
+    overflow: hidden;
+    animation: expand 0.5s ease-in-out forwards;
+}
+
+.warp-close {
+    overflow: hidden;
+    animation: collapse 0.3s ease-in-out forwards;
+}
+
+@keyframes expand {
+    from {
+        max-height: 0;
+    }
+
+    to {
+        max-height: 200px;
+    }
+}
+
+@keyframes collapse {
+    from {
+        max-height: 200px;
+    }
+
+    to {
+        max-height: 0;
+    }
+}
