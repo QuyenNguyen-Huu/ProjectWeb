@@ -1,11 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Footer from './components/layout/Footer';
-import BackToTopButton from './components/layout/BackToTopButton';
-import MobileBottomPanel from './components/layout/MobileBottomPanel';
-import HomePage from './pages/HomePage';
 import './App.css';
 import LayoutHeader from './components/layout/LayoutHeader';
+import LayoutButtonScroll from './components/layout/LayoutButtonScroll';
+import LayoutFooter from './components/layout/LayoutFooter';
 
 function App() {
   return (
@@ -31,14 +29,16 @@ function App() {
         <MobileBottomPanel /> */}
 
         {/* Test scroll */}
-        {/* <div className="mt-20 p-4 space-y-6">
-          {Array.from({ length: 40 }).map((_, i) => (
-            <p key={i} className="p-2 bg-gray-100 rounded">
-              Nội dung số {i + 1}
-            </p>
-          ))}
-        </div> */}
+          <div className="mt-20 p-4 space-y-6">
+            {Array.from({ length: 40 }).map((_, i) => (
+              <p key={i} className="p-2 bg-gray-100 rounded">
+                Nội dung số {i + 1}
+              </p>
+            ))}
+          </div>
+      <LayoutFooter />
       </div>
+      <LayoutButtonScroll />  
     </Router>
   );
 }
