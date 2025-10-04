@@ -6,6 +6,7 @@ import LayoutButtonScroll from './components/layout/LayoutButtonScroll';
 import LayoutFooter from './components/layout/LayoutFooter';
 import BrandBanner from './features/home/BrandBanner';
 import MainBanner from './features/home/MainBanner';
+import useIsDesktop from './hooks/useIsDesktop';
 
 function App() {
   return (
@@ -29,7 +30,7 @@ function App() {
         <Footer />
         <BackToTopButton />
         <MobileBottomPanel /> */}
-        <div className="mt-[180px]">
+        <div className={`${!useIsDesktop ? 'mt-[180px]' : 'mt-[80px]'} z-50`}>
           <MainBanner />
           <BrandBanner />
         </div>
@@ -41,7 +42,7 @@ function App() {
               </p>
             ))}
           </div>
-      <LayoutFooter />
+        <LayoutFooter />
       </div>
       <LayoutButtonScroll />  
     </Router>

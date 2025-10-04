@@ -33,11 +33,13 @@ export default function Header() {
             <div className="header-main">
                 {!isDesktop ? (
                     <MobileNav toggleForm={toggleForm} showForm={showForm} closing={closing} />
+                
                 ) : (
                     <DesktopNav />
                 )}
 
             </div>
+
         </header>
     )
 }
