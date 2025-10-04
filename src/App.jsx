@@ -31,21 +31,21 @@ function App() {
         <Footer />
         <BackToTopButton />
         <MobileBottomPanel /> */}
-        <div className={`${isDesktop ? 'mt-[180px]' : 'mt-[80px]'}`}>
+        <div className={`${isDesktop ? 'mt-[180px]' : 'mt-[54px]'}`}>
           <MainBanner />
           <BrandBanner />
         </div>
         {/* Test scroll */}
-          <div className="mt-20 p-4 space-y-6">
-            {Array.from({ length: 40 }).map((_, i) => (
-              <p key={i} className="p-2 bg-gray-100 rounded">
-                Nội dung số {i + 1}
-              </p>
-            ))}
-          </div>
+        <div className="mt-20 p-4 space-y-6">
+          {Array.from({ length: 40 }).map((_, i) => (
+            <p key={i} className="p-2 bg-gray-100 rounded">
+              Nội dung số {i + 1}
+            </p>
+          ))}
+        </div>
         <LayoutFooter />
       </div>
-      <LayoutButtonScroll />  
+      <LayoutButtonScroll />
     </Router>
   );
 }
