@@ -4,6 +4,8 @@ import './App.css';
 import LayoutHeader from './components/layout/LayoutHeader';
 import LayoutButtonScroll from './components/layout/LayoutButtonScroll';
 import LayoutFooter from './components/layout/LayoutFooter';
+import BrandBanner from './features/home/BrandBanner';
+import MainBanner from './features/home/MainBanner';
 
 function App() {
   return (
@@ -27,7 +29,10 @@ function App() {
         <Footer />
         <BackToTopButton />
         <MobileBottomPanel /> */}
-
+        <div className="mt-[180px]">
+          <MainBanner />
+          <BrandBanner />
+        </div>
         {/* Test scroll */}
           <div className="mt-20 p-4 space-y-6">
             {Array.from({ length: 40 }).map((_, i) => (
