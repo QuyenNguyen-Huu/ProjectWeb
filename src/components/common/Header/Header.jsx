@@ -26,7 +26,7 @@ export default function Header() {
             setClosing(false)
         }
     };
-    const scrollClass = isDesktop ? (show ? "translate-y-0" : "-translate-y-full") : "translate-y-0";
+    const scrollClass = show ? "translate-y-0" : "-translate-y-full";
 
     return (
         <header className={`header ${scrollClass}`}>

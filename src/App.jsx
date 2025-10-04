@@ -9,6 +9,7 @@ import MainBanner from './features/home/MainBanner';
 import useIsDesktop from './hooks/useIsDesktop';
 
 function App() {
+  const isDesktop = useIsDesktop();
   return (
     <Router>
       <div className="min-h-screen flex flex-col">
@@ -30,7 +31,7 @@ function App() {
         <Footer />
         <BackToTopButton />
         <MobileBottomPanel /> */}
-        <div className={`${!useIsDesktop ? 'mt-[180px]' : 'mt-[80px]'} z-50`}>
+        <div className={`${isDesktop ? 'mt-[180px]' : 'mt-[80px]'}`}>
           <MainBanner />
           <BrandBanner />
         </div>
