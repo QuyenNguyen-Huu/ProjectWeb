@@ -108,7 +108,7 @@ const NavBar = ({ isOpen, setIsOpen }) => {
           return (
             <div
               key={panel.key}
-              className={`absolute top-0 left-0 w-full h-full bg-gray-200 transform transition-transform duration-300 flex flex-col ${translateClass}`}
+              className={`absolute z-50 top-0 left-0 w-full h-full bg-gray-200 transform transition-transform duration-300 flex flex-col ${translateClass}`}
             >
               {/* Header */}
               <div className="flex items-center justify-center relative border-b border-gray-300 py-4">

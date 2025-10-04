@@ -6,8 +6,10 @@ import LayoutButtonScroll from './components/layout/LayoutButtonScroll';
 import LayoutFooter from './components/layout/LayoutFooter';
 import BrandBanner from './features/home/BrandBanner';
 import MainBanner from './features/home/MainBanner';
+import useIsDesktop from './hooks/useIsDesktop';
 
 function App() {
+  const isDesktop = useIsDesktop();
   return (
     <Router>
       <div className="min-h-screen flex flex-col">
@@ -29,7 +31,7 @@ function App() {
         <Footer />
         <BackToTopButton />
         <MobileBottomPanel /> */}
-        <div className="mt-[180px]">
+        <div className={`${isDesktop ? 'mt-[180px]' : 'mt-[80px]'}`}>
           <MainBanner />
           <BrandBanner />
         </div>
@@ -41,7 +43,7 @@ function App() {
               </p>
             ))}
           </div>
-      <LayoutFooter />
+        <LayoutFooter />
       </div>
       <LayoutButtonScroll />  
     </Router>

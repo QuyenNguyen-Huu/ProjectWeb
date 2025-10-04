@@ -13,7 +13,7 @@ const MobileNav = ({ toggleForm, showForm, closing, children }) => {
 
       {/* Main Content */}
       <div
-        className={`min-h-screen bg-white transform transition-transform duration-300 ${
+        className={`h-fit bg-white transform transition-transform duration-300 ${
           isOpen ? 'translate-x-[80%]' : 'translate-x-0'
         }`}
       >
@@ -29,7 +29,9 @@ const MobileNav = ({ toggleForm, showForm, closing, children }) => {
         </nav>
 
         {/* Nội dung body */}
-        <main className="p-4">{children}</main>
+        <main>
+        
+        </main>
       </div>
 
       {/* Transparent overlay khi drawer mở */}

@@ -12,7 +12,8 @@ a {
 
 /* ===== Header ===== */
 .header {
-    @apply fixed top-0 left-0 text-[#333] w-full h-[180px] bg-white z-50 transition-transform duration-500 ease-in-out;
+    @apply fixed top-0 left-0 text-[#333] w-full h-[180px]  bg-white z-50 transition-transform duration-500 ease-in-out;
+    @apply max-md:h-[80px]
 }
 
 .header-main {
