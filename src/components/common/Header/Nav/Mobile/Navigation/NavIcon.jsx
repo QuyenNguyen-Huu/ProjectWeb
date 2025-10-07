@@ -33,7 +33,7 @@ const NavIcon = ({ toggleForm, showForm, closing }) => {
                             <img
                                 loading="lazy"
                                 src="https://web.nvnstatic.net/tp/T0194/img/vn.png?v=9"
-                                className="w-[40px] h-[28px] hover:opacity-80 transition"
+                                className="max-w-[40px] max-h-[24px] w-auto h-auto hover:opacity-80 transition"
                                 alt="VN"
                             />
                         </a>
@@ -45,7 +45,7 @@ const NavIcon = ({ toggleForm, showForm, closing }) => {
                             <img
                                 loading="lazy"
                                 src="https://web.nvnstatic.net/tp/T0194/img/eng.png?v=9"
-                                className="w-[36px] h-[26px] hover:opacity-80 transition"
+                                className="max-w-[40px] max-h-[21px] w-auto h-auto hover:opacity-80 transition"
                                 alt="EN"
                             />
                         </a>

@@ -1,4 +1,4 @@
-/* Custom styles for the application */
+@import "tailwindcss";
 
 #root {
   min-height: 100vh;
@@ -13,4 +13,28 @@ html {
 .focus-visible {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
+}
+
+
+/* Card item */
+.action-button a:hover i {
+  color: white;
+}
+
+.sale-flash {
+  @apply absolute top-0 lg:top-[8%] left-[10px] w-[30px] h-[30px] text-center text-white font-bold z-[99] bg-[#673AB7] rounded-tl-none rounded-tr-none text-[10px] rounded-full flex items-center justify-center;
+}
+
+.sale-flash::before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  z-index: 1;
+  left: 2px;
+  top: -1.5px;
+  width: 26px;
+  height: 29px;
+  border: 1px solid #fff;
+  border-bottom-left-radius: 45%;
+  border-bottom-right-radius: 45%;
 }
