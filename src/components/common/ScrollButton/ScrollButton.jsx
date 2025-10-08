@@ -27,7 +27,7 @@ export default function ScrollToTopButton() {
       {isVisible && (
         <button 
         onClick={scrollToTop}
-        className="fixed z-50 bottom-5 right-5 bg-black text-white border-none px-4 py-3 rounded cursor-pointer shadow-md text-lg no-transition">
+        className="fixed z-50 bottom-50 right-5 bg-black text-white border-none px-4 py-3 rounded cursor-pointer shadow-md text-lg no-transition">
           <i aria-hidden="true" className="ml-1 text-[9px] fa fa-angle-up"></i>
       </button>
       )}
