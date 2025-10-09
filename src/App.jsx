@@ -4,7 +4,9 @@ import './App.css';
 import LayoutHeader from './components/layout/LayoutHeader';
 import LayoutButtonScroll from './components/layout/LayoutButtonScroll';
 import LayoutFooter from './components/layout/LayoutFooter';
+import LayoutMobileNav from './components/common/PanelButtom/LayoutMobileNav';
 import HomePage from './pages/HomePage';
+
 
 function App() {
   return (
@@ -20,7 +22,8 @@ function App() {
 
         {/* Footer & nút scroll luôn hiển thị */}
         <LayoutFooter />
-        <LayoutButtonScroll />z
+        <LayoutButtonScroll />
+        <LayoutMobileNav />
       </div>
     </Router>
   );

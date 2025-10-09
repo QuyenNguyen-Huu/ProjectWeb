@@ -1,6 +1,7 @@
 import Collections from "@/features/home/Collections/Collections";
 import BrandBanner from "@/features/home/HomeBanner/BrandBanner";
 import MainBanner from "@/features/home/HomeBanner/MainBanner";
+import PolicySection from "@/features/home/PolicySection";
 import useIsDesktop from "@/hooks/useIsDesktop";
 
 export default function HomePage() {
@@ -11,6 +12,7 @@ export default function HomePage() {
       <BrandBanner />
 
       <Collections />
+      <PolicySection />
     </div>
   );
 }
