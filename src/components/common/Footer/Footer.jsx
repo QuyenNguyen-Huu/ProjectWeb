@@ -19,19 +19,19 @@ export default function Footer() {
             hàng.
           </p>
           <div className="social-icons">
-            <a href="#" target="_blank" rel="noopener noreferrer">
-             <i className="fa fa-twitter" aria-hidden="true"></i>
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              <i className="fa fa-facebook" aria-hidden="true"></i>
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              <i className="fa fa-instagram" aria-hidden="true"></i>
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              <i className="fa fa-youtube" aria-hidden="true"></i>
-            </a>
-          </div>
+  <a href="#" target="_blank" rel="noopener noreferrer">
+    <i className="fab fa-twitter"></i>
+  </a>
+  <a href="#" target="_blank" rel="noopener noreferrer">
+    <i className="fab fa-facebook-f"></i>
+  </a>
+  <a href="#" target="_blank" rel="noopener noreferrer">
+    <i className="fab fa-instagram"></i>
+  </a>
+  <a href="#" target="_blank" rel="noopener noreferrer">
+    <i className="fab fa-youtube"></i>
+  </a>
+</div>
 
           {/* Ảnh logo / banner */}
           <div className="footer-logo">
