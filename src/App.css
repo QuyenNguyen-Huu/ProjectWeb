@@ -22,7 +22,7 @@ html {
 }
 
 .sale-flash {
-  @apply absolute top-0 lg:top-[8%] left-[10px] w-[30px] h-[30px] text-center text-white font-bold z-[99] bg-[#673AB7] rounded-tl-none rounded-tr-none text-[10px] rounded-full flex items-center justify-center;
+  @apply absolute top-0 lg:top-[8%] left-[10px] w-[30px] h-[30px] text-center text-white font-bold z-40 bg-[#673AB7] rounded-tl-none rounded-tr-none text-[10px] rounded-full flex items-center justify-center;
 }
 
 .sale-flash::before {
@@ -41,7 +41,8 @@ html {
 
 @media (max-width: 768px) {
   body {
-    padding-bottom: 60px; /* chiều cao menu */
+    padding-bottom: 60px;
+    /* chiều cao menu */
   }
 }
 
@@ -67,23 +68,28 @@ html {
   /* Kích hoạt CSS Scroll Snap */
   scroll-snap-type: x mandatory;
   /* Ẩn thanh cuộn */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
+
 .product-carousel::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
+  display: none;
+  /* Chrome, Safari and Opera */
 }
 
 /* Mobile: 2 items */
 .product-carousel-item {
-  flex: 0 0 50%; 
+  flex: 0 0 50%;
   scroll-snap-align: start;
   padding: 0 5px;
 }
+
 /* Desktop: 4 items */
 @media (min-width: 768px) {
   .product-carousel-item {
-    flex: 0 0 25%; 
+    flex: 0 0 25%;
     padding: 0 10px;
   }
 }
@@ -105,18 +111,21 @@ html {
   z-index: 10;
   border: none;
 }
+
 .product-carousel-container .nav-button:hover {
   background-color: #e66a2a;
 }
+
 .product-carousel-container .nav-button.prev {
   left: -22px;
 }
+
 .product-carousel-container .nav-button.next {
   right: -22px;
 }
 
 .collection_container {
-  max-width: 1200px; 
+  max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 40px;
@@ -128,6 +137,7 @@ html {
   .product-carousel-container .nav-button.prev {
     left: 10px;
   }
+
   .product-carousel-container .nav-button.next {
     right: 10px;
   }
@@ -144,12 +154,14 @@ html {
   font-size: 14px;
   margin-top: 2rem;
   transition: all 0.3s ease;
-  border: 1px solid transparent; /* Thêm border trong suốt để không bị giật layout khi hover */
+  border: 1px solid transparent;
+  /* Thêm border trong suốt để không bị giật layout khi hover */
 }
 
 .view-more-btn:hover {
   background-color: #e66a2a;
-  border: 1px solid black; /* Thêm border đen mỏng khi hover */
+  border: 1px solid black;
+  /* Thêm border đen mỏng khi hover */
 }
 
 /* --- Kết thúc CSS cho Product Carousel (CUSTOM) của Khiêm --- */

@@ -24,7 +24,7 @@ const ProductCard = ({
 
                 {/* Gift Tag */}
                 {isGift && (
-                    <div className="tag-gift absolute -top-1 lg:top-[6%] left-1/3 lg:left-[25%] z-50">
+                    <div className="tag-gift absolute -top-1 lg:top-[6%] left-1/3 lg:left-[25%] z-40">
                         <img
                             className="max-w-8 max-h-8"
                             loading="lazy"
@@ -37,7 +37,7 @@ const ProductCard = ({
                 <a href={href} title={title} className="block relative w-auto h-auto overflow-hidden">
                     {/* New / Best Seller Tag */}
                     {isNew && (
-                        <div className="tag-new tag-best-seller w-[150px] h-[150px] overflow-hidden absolute -top-2.5 -right-2.5 z-[100] text-center uppercase text-[10px]">
+                        <div className="tag-new tag-best-seller w-[150px] h-[150px] overflow-hidden absolute -top-2.5 -right-2.5 z-40 text-center uppercase text-[10px]">
                             <span className="absolute -left-[25px] top-[30px] w-[265px] px-0 py-[3px] rotate-[45deg] bg-[#F44336] text-white text-center shadow-[0_0_10px_rgba(0,0,0,0.2)] text-shadow-[0_1px_1px_rgba(0,0,0,0.2)] outline-[3px_solid_#F44336]">
                                 Best Seller
                             </span>
