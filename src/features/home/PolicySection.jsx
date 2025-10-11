@@ -21,12 +21,12 @@ export default function PolicySection() {
   ];
 
   return (
-    <div className="w-full bg-white py-6">
-      <div className="max-w-6xl mx-auto flex flex-row justify-between items-center">
+    <div className="bg-white py-6">
+      <div className="w-full mx-auto flex flex-row items-center text-center md:text-left lg:px-25 px-0">
         {policies.map((policy, index) => (
           <div
             key={index}
-            className="w-1/3 flex flex-col md:flex-row items-center md:items-center text-center md:text-left px-4"
+            className="w-1/3 justify-center flex flex-col md:flex-row items-center md:items-center px-4"
           >
             {/* icon */}
             <div className="mb-2 md:mb-0 md:mr-3">{policy.icon}</div>
