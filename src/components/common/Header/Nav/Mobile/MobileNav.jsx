@@ -7,15 +7,14 @@ const MobileNav = ({ toggleForm, showForm, closing, children }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="relative w-screen overflow-x-hidden">
+    <div className="relative w-screen">
       {/* Drawer */}
       <NavBar isOpen={isOpen} setIsOpen={setIsOpen} />
 
       {/* Main Content */}
       <div
-        className={`h-fit bg-white transform transition-transform duration-300 ${
-          isOpen ? 'translate-x-[80%]' : 'translate-x-0'
-        }`}
+        className={`h-full bg-white transform transition-transform duration-300 ${isOpen ? 'translate-x-[80%]' : 'translate-x-0'
+          }`}
       >
         {/* Header */}
         <nav className="flex items-center justify-between shadow px-1 py-1">
@@ -30,7 +29,7 @@ const MobileNav = ({ toggleForm, showForm, closing, children }) => {
 
         {/* Nội dung body */}
         <main>
-        
+
         </main>
       </div>
 
