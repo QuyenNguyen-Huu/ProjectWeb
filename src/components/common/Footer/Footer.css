@@ -1,17 +1,17 @@
 .footer .store-list {
 
-    list-style: none;
-    padding: 0;
-    margin: 0 0 10px 0;
-  }
-  
-  
-  
-  .footer {
-    background-color: #858688; 
-    padding: 40px 20px;
-    margin-top: 40px;
-  }
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px 0;
+}
+
+
+
+.footer {
+  background-color: #858688;
+  padding: 40px 20px;
+  margin-top: 40px;
+}
 
 .footer .store-list li {
   margin-bottom: 10px;
@@ -118,19 +118,19 @@
     max-width: 1200px;
     margin: auto;
   }
-  
+
   .footer-block {
     flex: 1;
     min-width: 220px;
     margin: 10px;
   }
-  
+
   .footer-block h3 {
     margin-bottom: 15px;
     font-size: 18px;
     color: white;
   }
-  
+
   .footer-block p,
   .footer-block li,
   .footer-block a {
@@ -153,15 +153,15 @@
     grid-template-columns: 1fr;
   }
 
-  
+
 
   .footer-section {
-  color: white;
-}
+    color: white;
+  }
 
-.footer-section strong {
-  color: white;
-}
+  .footer-section strong {
+    color: white;
+  }
 }
 
 /*icon máy bay*/
@@ -174,7 +174,8 @@
 
 .email-input-wrapper input {
   width: 100%;
-  padding: 10px 35px 10px 10px; /* chừa khoảng trống bên phải cho icon */
+  padding: 10px 35px 10px 10px;
+  /* chừa khoảng trống bên phải cho icon */
   border: none;
   border-bottom: 1px solid #ccc;
   background: transparent;
@@ -189,7 +190,8 @@
 
 .email-input-wrapper .send-icon {
   position: absolute;
-  right: 8px; /* sát mép phải */
+  right: 8px;
+  /* sát mép phải */
   top: 50%;
   transform: translateY(-50%);
   font-size: 18px;
@@ -209,4 +211,3 @@
 .footer-section strong {
   color: white;
 }
-

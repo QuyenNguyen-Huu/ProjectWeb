@@ -16,20 +16,20 @@ const MainBanner = () => {
   const dataImage = [
     { id: 1, image: imgbanner1 },
     { id: 2, image: imgbanner2 },
-    {id: 3, image: imgbanner3 },
-    {id: 4, image: imgbanner4 },
-    {id: 5, image: imgbanner5 },
-    {id: 6, image: imgbanner6 },
-    {id: 7, image: imgbanner7 },
-    {id: 8, image: imgbanner8 },
+    { id: 3, image: imgbanner3 },
+    { id: 4, image: imgbanner4 },
+    { id: 5, image: imgbanner5 },
+    { id: 6, image: imgbanner6 },
+    { id: 7, image: imgbanner7 },
+    { id: 8, image: imgbanner8 },
   ]
   return (
     <div className='w-screen'>
       <Swiper
         modules={[Autoplay]}
         slidesPerView={1}
-        loop={true} 
-        threshold={0} 
+        loop={true}
+        threshold={0}
         speed={500}
         autoplay={{ delay: 5000, disableOnInteraction: false }}
       >
