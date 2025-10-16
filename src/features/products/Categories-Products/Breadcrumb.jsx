@@ -8,7 +8,6 @@ const Breadcrumb = ({ breadcrumbItems = [] }) => {
                 <div className="w-full md:w-1/2 px-[15px]">
                     <ul className="m-0 p-0 text-[1em] bg-transparent rounded-none">
                         {breadcrumbItems.map((item, index) => (
-                            // Dùng React.Fragment để nhóm các phần tử mà không thêm thẻ div thừa
                             <React.Fragment key={item.link}>
                                 <li className="inline">
                                     {/* 2. Kiểm tra xem có phải là item cuối cùng không */}
