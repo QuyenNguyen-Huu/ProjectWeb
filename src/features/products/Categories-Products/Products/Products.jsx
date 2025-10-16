@@ -1,4 +1,3 @@
-// src/features/home/Collections/components/Products/index.jsx
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Pagination from "./Pagination";
