@@ -27,7 +27,7 @@ export const mockNewProducts = [
       "https://pos.nvncdn.com/be3294-43017/ps/20250708_glBOtLBwEt.jpeg?v=1751962866",
       "https://pos.nvncdn.com/be3294-43017/ps/20250708_OyE1vhN97z.png?v=1751962869",
     ],
-  },{
+  }, {
     id: 104,
     title: "Kjerag 02 | Giày Chạy Địa Hình Nam NNormal Kjerag 02 - Black",
     href: "/kjerag-02-giay-chay-dia-hinh-nam-nnormal-kjerag-02-black-p39113686.html",
@@ -35,7 +35,7 @@ export const mockNewProducts = [
       "https://pos.nvncdn.com/be3294-43017/ps/20250922_ZwTIxrfkFG.jpeg?v=1758510028",
       "https://pos.nvncdn.com/be3294-43017/ps/20250922_bsnOl2qzW9.png?v=1758475089",
     ],
-  },{
+  }, {
     id: 105,
     title: "Áo Chạy Bộ Nam On Running Men's Pace Mesh-T - Black/Horizon",
     href: "/ao-chay-bo-nam-on-running-mens-pace-mesht-blackhorizon-p39113369.html",
@@ -43,7 +43,7 @@ export const mockNewProducts = [
       "https://pos.nvncdn.com/be3294-43017/ps/20250825_OLYXT2eGsC.jpeg?v=1756108218",
       "https://pos.nvncdn.com/be3294-43017/ps/20250825_41jR48DXZa.png?v=1756108323",
     ],
-  },{
+  }, {
     id: 106,
     title: "Áo Khoác Chạy Bộ Nam On Running Men's Weather Jacket - Desert/Cinder",
     href: "/ao-khoac-chay-bo-nam-on-running-mens-weather-jacket-desertcinder-p39113601.html",
@@ -51,7 +51,7 @@ export const mockNewProducts = [
       "https://pos.nvncdn.com/be3294-43017/ps/20250905_CmmW3bkZ0I.jpeg?v=1757064099",
       "https://pos.nvncdn.com/be3294-43017/ps/20250905_EskMG6S41F.png?v=1757064126",
     ],
-  },{
+  }, {
     id: 107,
     title: "Áo Khoác Chống Nước Nam NNormal Trail Rain Jacket Black Men - Green",
     href: "/ao-khoac-chong-nuoc-nam-nnormal-trail-rain-jacket-black-men-green-p39113427.html",
@@ -59,7 +59,7 @@ export const mockNewProducts = [
       "https://pos.nvncdn.com/be3294-43017/ps/20250827_V28O8cqMLz.jpeg?v=1756294120",
       "https://pos.nvncdn.com/be3294-43017/ps/20250827_EHnvHgSUee.png?v=1756294123",
     ],
-  },{
+  }, {
     id: 108,
     title: "Bucket Hat | Mũ Chạy Bộ Rộng Vành Fractel B-Series - Sprout",
     href: "/bucket-hat-mu-chay-bo-rong-vanh-fractel-bseries-sprout-p39112548.html",

@@ -13,7 +13,7 @@ const DesktopNav = () => {
             </div>
 
             {/* Nav Bar */}
-            <NavBar />
+            {/* <NavBar /> */}
         </>
     );
 };

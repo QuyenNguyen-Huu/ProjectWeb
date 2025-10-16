@@ -30,10 +30,10 @@ export default function Header() {
 
     return (
         <header className={`header ${scrollClass}`}>
-            <div className="header-main">
+            <div className="container-main">
                 {!isDesktop ? (
                     <MobileNav toggleForm={toggleForm} showForm={showForm} closing={closing} />
-                
+
                 ) : (
                     <DesktopNav />
                 )}

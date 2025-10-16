@@ -5,9 +5,9 @@ const CollectionGrid = ({ products }) => {
 
     return (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-x-[5px] gap-y-[15px]">
-            {products.map((product) => (
+            {products.map((product, index) => (
                 <ProductCard
-                    key={product.id}
+                    key={index}
                     title={product.title}
                     href={product.href}
                     images={product.images}
