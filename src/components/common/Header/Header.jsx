@@ -37,9 +37,7 @@ export default function Header() {
                 ) : (
                     <DesktopNav />
                 )}
-
             </div>
-
         </header>
     )
 }
