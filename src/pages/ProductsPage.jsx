@@ -35,6 +35,8 @@ export default function ProductsPage() {
                     <Products />
                 </div>
             </div>
+        
+           
         </>
 
     );
