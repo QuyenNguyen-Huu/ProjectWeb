@@ -9,7 +9,7 @@ import useIsDesktop from "@/hooks/useIsDesktop";
 export default function HomePage() {
   const isDesktop = useIsDesktop();
   return (
-    <div className={`${isDesktop ? 'mt-[180px]' : 'mt-[54px]'}`}>
+    <div className={`${isDesktop ? 'mt-[80px]' : 'mt-[54px]'}`}>
       <MainBanner />
       <BrandBanner />
       <FeaturedProducts />

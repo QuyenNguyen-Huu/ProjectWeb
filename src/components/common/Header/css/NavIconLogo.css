@@ -21,11 +21,12 @@ a {
 
 /* ===== Header ===== */
 .header {
-    @apply fixed top-0 left-0 text-[#333] w-full h-[180px] bg-white z-50 transition-transform duration-500 ease-in-out;
-    @apply max-md:h-[54px]
+    @apply relative top-0 left-0 text-[#333] w-full h-fit bg-white z-50 transition-transform duration-500 ease-in-out;
+    @apply max-md:h-[54px];
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.15)
 }
 
-.header-main {
+.container-main {
     /* Base */
     @apply relative z-50 table w-full bg-white pl-0 pr-0;
 

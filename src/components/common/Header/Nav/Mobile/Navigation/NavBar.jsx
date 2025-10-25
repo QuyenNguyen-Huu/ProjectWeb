@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+// BƯỚC 1: Import "Link" từ react-router-dom
+import { Link } from "react-router-dom";
 
 // Icon tái sử dụng
 const Icon = ({ name, className = "" }) => (
@@ -8,6 +10,34 @@ const Icon = ({ name, className = "" }) => (
 const NavBar = ({ isOpen, setIsOpen }) => {
   const [activeMenu, setActiveMenu] = useState("main");
 
+  // BƯỚC 2: Tạo dữ liệu menu con để dễ quản lý
+  const menuData = {
+    men: [
+      { label: "Áo", href: "/men/shirt" },
+      { label: "Quần", href: "/men/pants" },
+      { label: "Giày Chạy Bộ", href: "/men/run-shoes" },
+      { label: "Giày Địa Hình", href: "/men/trail-shoes" },
+    ],
+    women: [
+      { label: "Áo", href: "/women/shirt" },
+      { label: "Quần", href: "/women/pants" },
+      { label: "Giày Chạy Bộ", href: "/women/run-shoes" },
+      { label: "Giày Địa Hình", href: "/women/trail-shoes" },
+    ],
+    watch: [
+      { label: "Đồng Hồ Suunto", href: "/watch/suunto" },
+      { label: "Đồng Hồ Garmin", href: "/watch/garmin" },
+      { label: "Đồng Hồ Coros", href: "/watch/coros" },
+    ],
+  };
+
+  // BƯỚC 3: Hàm xử lý khi bấm vào Link (để đóng menu)
+  const handleLinkClick = () => {
+    setIsOpen(false);
+    // Tùy chọn: reset về menu chính sau khi đóng
+    // setActiveMenu("main"); 
+  };
+
   const panels = [
     {
       key: "main",
@@ -15,20 +45,29 @@ const NavBar = ({ isOpen, setIsOpen }) => {
       content: (
         <ul className="font-montserrat text-[15px] font-medium">
           <li className="px-4 py-3 border-b border-gray-300">
-            <a href="/about" onClick={() => setIsOpen(false)}>
+            {/* BƯỚC 4: Dùng Link và hàm onClick */}
+            <Link to="/about" onClick={handleLinkClick}>
               Giới Thiệu
-            </a>
+            </Link>
           </li>
           {[
-            { label: "Đồ Nam", key: "men" },
-            { label: "Đồ Nữ", key: "women" },
-            { label: "Đồng Hồ", key: "watch" },
+            { label: "Đồ Nam", key: "men", href: "/do-nam" },
+            { label: "Đồ Nữ", key: "women", href: "/do-nu" },
+            { label: "Đồng Hồ", key: "watch", href: "/dong-ho" },
           ].map((item) => (
             <li
               key={item.key}
               className="flex justify-between items-center border-b border-gray-300"
             >
-              <span className="flex-1 px-4 py-3">{item.label}</span>
+              {/* BƯỚC 5: Biến label thành Link */}
+              <Link
+                to={item.href}
+                onClick={handleLinkClick}
+                className="flex-1 px-4 py-3"
+              >
+                {item.label}
+              </Link>
+              {/* Nút này chỉ để mở submenu */}
               <button
                 onClick={() => setActiveMenu(item.key)}
                 className="px-4 py-3 border-l border-gray-300 text-gray-600"
@@ -38,50 +77,77 @@ const NavBar = ({ isOpen, setIsOpen }) => {
             </li>
           ))}
           <li className="px-4 py-3 border-b border-gray-300">
-            <a href="/sale" onClick={() => setIsOpen(false)}>
+            {/* BƯỚC 4: Dùng Link và hàm onClick */}
+            <Link to="/sale" onClick={handleLinkClick}>
               Sale
-            </a>
+            </Link>
           </li>
         </ul>
       ),
     },
+    // BƯỚC 6: Cập nhật các submenu (Đồ Nam)
     {
       key: "men",
       title: "Đồ Nam",
       back: "main",
       content: (
         <ul className="font-montserrat text-[15px] font-medium">
-          {["Áo", "Quần", "Giày Chạy Bộ", "Giày Địa Hình"].map((item, i) => (
+          {/* Thêm link "Xem tất cả" */}
+          <li className="px-4 py-3 border-b border-gray-300 font-bold">
+            <Link to="/do-nam" onClick={handleLinkClick}>
+              Xem tất cả Đồ Nam
+            </Link>
+          </li>
+          {/* Render các link con */}
+          {menuData.men.map((item, i) => (
             <li key={i} className="px-4 py-3 border-b border-gray-300">
-              {item}
+              <Link to={item.href} onClick={handleLinkClick}>
+                {item.label}
+              </Link>
             </li>
           ))}
         </ul>
       ),
     },
+    // BƯỚC 6: Cập nhật các submenu (Đồ Nữ)
     {
       key: "women",
       title: "Đồ Nữ",
       back: "main",
       content: (
         <ul className="font-montserrat text-[15px] font-medium">
-          {["Áo", "Quần", "Giày Chạy Bộ", "Giày Địa Hình"].map((item, i) => (
+          <li className="px-4 py-3 border-b border-gray-300 font-bold">
+            <Link to="/do-nu" onClick={handleLinkClick}>
+              Xem tất cả Đồ Nữ
+            </Link>
+          </li>
+          {menuData.women.map((item, i) => (
             <li key={i} className="px-4 py-3 border-b border-gray-300">
-              {item}
+              <Link to={item.href} onClick={handleLinkClick}>
+                {item.label}
+              </Link>
             </li>
           ))}
         </ul>
       ),
     },
+    // BƯỚC 6: Cập nhật các submenu (Đồng Hồ)
     {
       key: "watch",
       title: "Đồng Hồ",
       back: "main",
       content: (
         <ul className="font-montserrat text-[15px] font-medium">
-          {["Đồng Hồ Suunto", "Đồng Hồ Garmin", "Đồng Hồ Coros"].map((item, i) => (
+          <li className="px-4 py-3 border-b border-gray-300 font-bold">
+            <Link to="/dong-ho" onClick={handleLinkClick}>
+              Xem tất cả Đồng Hồ
+            </Link>
+          </li>
+          {menuData.watch.map((item, i) => (
             <li key={i} className="px-4 py-3 border-b border-gray-300">
-              {item}
+              <Link to={item.href} onClick={handleLinkClick}>
+                {item.label}
+              </Link>
             </li>
           ))}
         </ul>

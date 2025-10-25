@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react'; // Bỏ useState vì không còn dùng
 import Logo from '../../Item/Logo';
 import NavIcon from './Navigation/NavIcon';
 import NavBar from './Navigation/NavBar';
 
-const DesktopNav = () => {
+// BƯỚC 1: Nhận prop "hideNavBar"
+const DesktopNav = ({ hideNavBar }) => {
     return (
         <>
-            {/* Logo + Nav Icon */}
+            {/* Logo + Nav Icon (Luôn hiển thị) */}
             <div className='gobal-style'>
                 <Logo />
                 <NavIcon />
             </div>
 
-            {/* Nav Bar */}
-            <NavBar />
+            {/* Nav Bar (Chỉ hiển thị khi hideNavBar là false) */}
+            {!hideNavBar && <NavBar />}
         </>
     );
 };
