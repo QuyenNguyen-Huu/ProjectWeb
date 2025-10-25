@@ -16,15 +16,30 @@ const NavItem = ({ item, openFilters, setOpenFilters, isOpen, onToggle }) => {
 
             {
                 isOpen && (
-                    <ul className="dropdown-menu  pl-2 border-gray-200">
-                        {item.children.map((child) => (
-                            <li key={child.id} className="nav-item child-item py-1 " onClick={() => setOpenFilters(!openFilters)}>
-                                <Link to={child.link} className="nav-link text-gray-700 hover:!text-[#673AB7] flex items-center">
+                    <ul className="dropdown-menu pl-2 border-gray-200">
+                        {item.children.map((child, index) => {
+                            const isActive = location.pathname === child.link;
+                            console.log(isActive)
+                            return (
+                            <li
+                                key={child.index}
+                                className="nav-item child-item py-1"
+                                onClick={() => setOpenFilters(!openFilters)}
+                            >
+                                <Link
+                                    to={child.link}
+                                    className={`nav-link flex items-center transition-colors duration-200 ${
+  isActive
+    ? "!text-[#673AB7]"
+    : "text-gray-700 hover:!text-[#673AB7]"
+}`}
+                                    >
                                     <i className="fa fa-caret-right text-gray-400 mr-2 text-xs"></i>
                                     {child.name}
                                 </Link>
                             </li>
-                        ))}
+                            );
+                        })}
                     </ul>
                 )
             }
