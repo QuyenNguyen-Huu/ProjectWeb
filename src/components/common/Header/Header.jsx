@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+// BƯỚC 1: Import useLocation từ react-router-dom
+import { useLocation } from 'react-router-dom';
 import useIsDesktop from '../../../hooks/useIsDesktop';
 import useScrollDirection from '../../../hooks/useScrollDirection';
 import MobileNav from './Nav/Mobile/MobileNav';
@@ -12,6 +14,13 @@ export default function Header() {
     const show = useScrollDirection();
     const [showForm, setShowForm] = useState(false);
     const [closing, setClosing] = useState(false);
+
+    // BƯỚC 2: Lấy thông tin vị trí (URL) hiện tại
+    const location = useLocation();
+
+    // BƯỚC 3: Kiểm tra xem có phải là trang ProductsPage (trang category) không
+    // Logic: KHÔNG phải trang chủ VÀ KHÔNG phải trang chi tiết sản phẩm
+    const isProductsPage = location.pathname !== '/' && !location.pathname.endsWith('.html');
 
     // Toggle form search
     const toggleForm = () => {
@@ -30,16 +39,15 @@ export default function Header() {
 
     return (
         <header className={`header ${scrollClass}`}>
-            <div className="header-main">
+            <div className="container-main">
                 {!isDesktop ? (
                     <MobileNav toggleForm={toggleForm} showForm={showForm} closing={closing} />
-                
+
                 ) : (
-                    <DesktopNav />
+                    // BƯỚC 4: Truyền tín hiệu "hideNavBar" xuống DesktopNav
+                    <DesktopNav hideNavBar={isProductsPage} />
                 )}
-
             </div>
-
         </header>
     )
 }

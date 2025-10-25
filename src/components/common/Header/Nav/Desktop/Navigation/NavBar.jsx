@@ -1,18 +1,23 @@
 import React from "react";
+// BƯỚC 1: Import "Link" từ react-router-dom
+import { Link } from "react-router-dom";
 
 // Component con cho item có submenu
 const NavItem = ({ label, href, submenu }) => {
   if (submenu && submenu.length > 0) {
     return (
       <li className="group relative cursor-pointer">
-        <span className="flex items-center">
+        {/* BƯỚC 2: Biến mục cha thành Link */}
+        <Link to={href} className="flex items-center">
           {label}
           <i aria-hidden="true" className="ml-1 text-[9px] fa fa-angle-down"></i>
-        </span>
+        </Link>
+        {/* Submenu */}
         <ul className="absolute left-0 top-full hidden group-hover:block bg-white shadow-md py-2 w-48 z-10">
           {submenu.map((item, idx) => (
             <li key={idx} className="px-4 py-2 cursor-pointer hover:bg-gray-100">
-              <a href={item.href}>{item.label}</a>
+              {/* BƯỚC 3: Biến các mục con thành Link */}
+              <Link to={item.href} className="block w-full">{item.label}</Link>
             </li>
           ))}
         </ul>
@@ -20,9 +25,11 @@ const NavItem = ({ label, href, submenu }) => {
     );
   }
 
+  // Item không có submenu
   return (
     <li className="cursor-pointer">
-      <a href={href}>{label}</a>
+      {/* BƯỚC 4: Biến mục đơn thành Link */}
+      <Link to={href}>{label}</Link>
     </li>
   );
 };
@@ -32,6 +39,7 @@ const navItems = [
   { label: "Giới Thiệu", href: "/about" },
   {
     label: "Đồ nam",
+    href: "/do-nam", // <-- BƯỚC 5: Thêm href cho mục cha
     submenu: [
       { label: "Áo", href: "/men/shirt" },
       { label: "Quần", href: "/men/pants" },
@@ -41,6 +49,7 @@ const navItems = [
   },
   {
     label: "Đồ nữ",
+    href: "/do-nu", // <-- BƯỚC 5: Thêm href cho mục cha
     submenu: [
       { label: "Áo", href: "/women/shirt" },
       { label: "Quần", href: "/women/pants" },
@@ -50,6 +59,7 @@ const navItems = [
   },
   {
     label: "Đồng hồ",
+    href: "/dong-ho", // <-- BƯỚC 5: Thêm href cho mục cha
     submenu: [
       { label: "Đồng Hồ Suunto", href: "/watch/suunto" },
       { label: "Đồng Hồ Garmin", href: "/watch/garmin" },

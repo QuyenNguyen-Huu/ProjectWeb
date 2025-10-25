@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+.collection-products,
+.sidebar {
+    @apply relative min-h-0.5 pr-4 pl-4 min-w-1/4 float-left
+}
+
+.border-cus {
+    @apply xl:pt-[10px] xl:border xl:border-[#e8e8e8];
+}
+
+@media (max-width: 991px) {
+
+    .dqdt-sidebar {
+        @apply fixed top-0 bottom-0 right-0 w-[256px] bg-white p-4 border border-[#bbbbbb] overflow-auto z-[100000] opacity-0 pointer-events-none translate-x-full transition-all duration-500 ease-in-out;
+    }
+
+    .dqdt-sidebar.open {
+        @apply opacity-100 pointer-events-auto translate-x-0;
+    }
+
+    .open-filters {
+        @apply fixed -right-0.5 top-[35%] bg-[#673AB7] text-white px-[10px] py-[4px] cursor-pointer z-[99999] transition-all duration-500 ease-in-out select-none outline-none flex items-center justify-center;
+    }
+
+    .open-filters.open {
+        @apply right-[256px];
+    }
+}
+
+
+
+.sidebar-category .nav-item .child-item {
+    @apply relative clear-left text-[1em] px-5 cursor-pointer flex items-center space-x-2;
+}
+
+.nav-item {
+    @apply py-1 select-none;
+}
