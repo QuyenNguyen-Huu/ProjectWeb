@@ -6,7 +6,8 @@ import ProductGrid from "./ProductGrid";
 import useProducts from "./useProducts";
 import CategoryDescription from '../Components/CategoryDescription/CategoryDescription';
 
-     const descriptionHtml = `
+
+const descriptionHtml = `
       <h3 class="text-xl font-bold mb-4 mt-6 text-gray-900">Đồ Chạy Bộ Nam – Sự Lựa Chọn Của Những Runner Đẳng Cấp</h3>
       <p class="mb-4 text-gray-900">Bạn đang tìm kiếm trang phục và giày chạy bộ <strong>cao cấp</strong>, đáp ứng được cả yếu tố <strong>hiệu suất, sự bền bỉ và tính thời trang</strong>? Bộ sưu tập <strong>đồ chạy bộ nam</strong> tại [Tên Website] mang đến những sản phẩm <strong>tốt nhất thế giới</strong>, giúp bạn <strong>tối ưu trải nghiệm chạy và chinh phục mọi cung đường</strong>.</p>
       

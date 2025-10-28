@@ -21,23 +21,22 @@ const NavItem = ({ item, openFilters, setOpenFilters, isOpen, onToggle }) => {
                             const isActive = location.pathname === child.link;
                             console.log(isActive)
                             return (
-                            <li
-                                key={child.index}
-                                className="nav-item child-item py-1"
-                                onClick={() => setOpenFilters(!openFilters)}
-                            >
-                                <Link
-                                    to={child.link}
-                                    className={`nav-link flex items-center transition-colors duration-200 ${
-  isActive
-    ? "!text-[#673AB7]"
-    : "text-gray-700 hover:!text-[#673AB7]"
-}`}
+                                <li
+                                    key={child.index}
+                                    className="nav-item child-item py-1"
+                                    onClick={() => setOpenFilters(!openFilters)}
+                                >
+                                    <Link
+                                        to={child.link}
+                                        className={`nav-link flex items-center transition-colors duration-200 ${isActive
+                                            ? "!text-[#673AB7]"
+                                            : "text-gray-700 hover:!text-[#673AB7]"
+                                            }`}
                                     >
-                                    <i className="fa fa-caret-right text-gray-400 mr-2 text-xs"></i>
-                                    {child.name}
-                                </Link>
-                            </li>
+                                        <i className="fa fa-caret-right text-gray-400 mr-2 text-xs"></i>
+                                        {child.name}
+                                    </Link>
+                                </li>
                             );
                         })}
                     </ul>

@@ -13,12 +13,15 @@ const Breadcrumb = ({ breadcrumbItems = [] }) => {
                                     {/* 2. Kiểm tra xem có phải là item cuối cùng không */}
                                     {index < breadcrumbItems.length - 1 ? (
                                         // Nếu KHÔNG phải cuối -> hiển thị Link
-                                        <Link to={item.link} className="hover:underline hover:text-purple-600 transition-colors duration-200">
-                                            {item.name}
+                                        <Link href={item.link}>
+                                            <span className="hover:underline hover:text-purple-600 transition-colors duration-200">
+                                                {item.name}
+                                            </span>
                                         </Link>
+
                                     ) : (
                                         // Nếu LÀ cuối -> chỉ hiển thị text, không có link
-                                        <span className= "hover:text-purple-600" >{item.name}</span>
+                                        <span className="hover:text-purple-600" >{item.name}</span>
                                     )}
                                 </li>
 
