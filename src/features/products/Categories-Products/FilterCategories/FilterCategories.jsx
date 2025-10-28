@@ -118,7 +118,7 @@ const SidebarCategories = () => {
                 </aside>
             </aside >
             <div id="open-filters" className={` open-filters md:hidden lg:hidden ${openFilters ? 'open' : ''}`} onClick={() => { setOpenFilters(!openFilters) }}>
-                <i className="fa fa-align-right !text-2xl"></i>
+                <i className={`fa ${openFilters ? 'fa-times' : 'fa-align-right'} !text-2xl font-bold`}></i>
             </div>
         </>
 

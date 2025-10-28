@@ -14,7 +14,6 @@ export default function PriceFilter() {
     const [minInput, setMinInput] = useState("0");
     const [maxInput, setMaxInput] = useState(MAX_PRICE.toString());
 
-    // 🧠 Lấy giá từ URL khi load hoặc khi query thay đổi
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const priceParam = params.get("price");
