@@ -29,8 +29,8 @@ const NavItem = ({ item, openFilters, setOpenFilters, isOpen, onToggle }) => {
                                     <Link
                                         to={child.link}
                                         className={`nav-link flex items-center transition-colors duration-200 ${isActive
-                                            ? "!text-[#673AB7]"
-                                            : "text-gray-700 hover:!text-[#673AB7]"
+                                                ? "!text-[#673AB7]"
+                                                : "text-gray-700 hover:!text-[#673AB7]"
                                             }`}
                                     >
                                         <i className="fa fa-caret-right text-gray-400 mr-2 text-xs"></i>
