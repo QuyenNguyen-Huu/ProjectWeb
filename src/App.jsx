@@ -9,15 +9,18 @@ import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 // Đảm bảo bạn đã import trang chi tiết sản phẩm chúng ta đã tạo
 import ProductDetailPage from './pages/ProductDetailPage'; 
+import CartPage from './pages/CartPage';
 
 function App() {
   return (
-    <Router>
+
       <div className="min-h-screen flex flex-col overflow-hidden">
         <LayoutHeader />
 
         <Routes>
           <Route path="/" element={<HomePage />} />
+
+          <Route path="/cart" element={<CartPage />} />
 
           {/* Route cho Chi tiết Sản phẩm (Product Detail)
             Route này sẽ bắt bất kỳ URL nào có dạng /:productSlug.html */}
@@ -33,7 +36,7 @@ function App() {
         <LayoutButtonScroll />
         <LayoutMobileNav />
       </div>
-    </Router>
+    
   );
 }
 

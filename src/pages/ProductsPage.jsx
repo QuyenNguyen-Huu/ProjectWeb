@@ -22,7 +22,8 @@ export default function ProductsPage() {
     return (
         <>
             <section
-                className="bg-[#f4f4f4] mb-10 py-10 bg-[position:center_top] bg-no-repeat"
+            // nếu muốn đổi nền xám thêm cái này vào bg-[#f4f4f4]
+                className=" mb-10 py-10 bg-[position:center_top] bg-no-repeat"
                 style={{ backgroundImage: "url(https://pos.nvncdn.com/be3294-43017/pc/20250701_TUKu18bH.jpg?v=1751362767)" }}
             >
                 {/* Hiển thị "breadcrumb" là chuỗi liên kết thể hiện vị trí hiện tại */}
