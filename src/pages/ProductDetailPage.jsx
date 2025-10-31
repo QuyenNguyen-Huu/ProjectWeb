@@ -2,20 +2,21 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import useIsDesktop from "@/hooks/useIsDesktop";
 import Breadcrumb from "@/features/products/Categories-Products/Breadcrumb";
+import { useCart } from '../context/cartContext';
 
 // --- Dữ liệu Mockup ---
 const mockProductData = {
     brand: "Zoot",
     sku: "SV-ZFT350990",
     price: "6,990,000 VNĐ",
-    sizes: ["S", "M"], 
+    sizes: ["S", "M"],
     images: [
         "https://pos.nvncdn.com/be3294-43017/ps/20251020_RTBesDbTCn.jpeg?v=1760934854",
         "https://pos.nvncdn.com/be3294-43017/ps/20251018_llY0feKjFK.jpeg?v=1760771662",
         "https://pos.nvncdn.com/be3294-43017/ps/20251018_EGa4aTsdxm.jpeg?v=1760771660",
         "https://pos.nvncdn.com/be3294-43017/ps/20251018_oL1U7S0BeY.jpeg?v=1760771664"
     ],
-    highlights: [ "Vento Aero Fabric...", "Cool Storage Pockets...", /* ... */ ],
+    highlights: ["Vento Aero Fabric...", "Cool Storage Pockets...", /* ... */],
     description: `
         <p><strong>Mô tả sản phẩm:</strong></p>
         <ul class="list-disc list-inside space-y-1 mb-4">
@@ -53,11 +54,11 @@ const ZOOM_SCALE = ZOOM_BOX_SIZE / LENS_SIZE;
 export default function ProductDetailPage() {
     const isDesktop = useIsDesktop();
     const { productSlug } = useParams();
-    
+
     // --- State ---
     const [productName, setProductName] = useState('');
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-    const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0); 
+    const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
     const [selectedSize, setSelectedSize] = useState(mockProductData.sizes[0]);
     const [quantity, setQuantity] = useState(1);
     const [breadcrumbItems, setBreadcrumbItems] = useState([]);
@@ -70,6 +71,7 @@ export default function ProductDetailPage() {
     const { images, sizes, brand, sku, price, highlights, description } = mockProductData;
     const totalImages = images.length;
 
+    const { addToCart } = useCart();
     // --- Effects ---
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -79,7 +81,7 @@ export default function ProductDetailPage() {
         if (breadcrumbName.length > 40) breadcrumbName = breadcrumbName.substring(0, 40) + '...';
         setBreadcrumbItems([
             { name: 'Trang chủ', link: '/' },
-            { name: 'Men', link: '/do-nam' }, 
+            { name: 'Men', link: '/do-nam' },
             { name: breadcrumbName, link: `/${productSlug}.html` }
         ]);
         setSelectedImageIndex(0);
@@ -92,6 +94,27 @@ export default function ProductDetailPage() {
     const isNextDisabled = thumbnailStartIndex >= totalImages - desktopThumbnailsVisible;
     const handlePrevThumbnail = () => setThumbnailStartIndex(prev => Math.max(0, prev - 1));
     const handleNextThumbnail = () => setThumbnailStartIndex(prev => Math.min(totalImages - desktopThumbnailsVisible, prev + 1));
+
+    const handleAddToCart = () => {
+        // Lấy dữ liệu từ state và mock data
+        const productToAdd = {
+            id: productSlug, // Dùng slug làm ID
+            name: productName,
+            price: price,
+            image: images[0], // Lấy ảnh đầu tiên
+            size: selectedSize // Lấy size đã chọn từ state
+        };
+
+        // Gọi hàm từ context, truyền vào sản phẩm và số lượng (từ state)
+        for (let i = 0; i < quantity; i++) {
+            addToCart(productToAdd);
+        }
+
+        // Thông báo cho người dùng
+        console.log(`Đã thêm ${quantity} x ${productName} (Size: ${selectedSize}) vào giỏ!`);
+    };
+
+
 
     const handleMouseEnter = (e) => {
         if (!mainImageRef.current) return;
@@ -143,7 +166,7 @@ export default function ProductDetailPage() {
                         </div>
 
                         {/* Main Image */}
-                        <div 
+                        <div
                             className="w-full relative order-first lg:order-none flex-1"
                             ref={mainImageRef}
                             onMouseEnter={handleMouseEnter}
@@ -153,7 +176,7 @@ export default function ProductDetailPage() {
                             <img src={images[selectedImageIndex]} alt="Main product" className="w-full h-auto object-cover border" />
 
                             {/* Ống kính (Lens) */}
-                            <div 
+                            <div
                                 className={`absolute border-2 border-gray-400 ${isZooming && isDesktop ? 'block' : 'hidden'} pointer-events-none`}
                                 style={{
                                     width: `${LENS_SIZE}px`,
@@ -167,7 +190,7 @@ export default function ProductDetailPage() {
                         </div>
 
                         {/* Khung Zoom (chỉ hiển thị trên desktop) */}
-                        <div 
+                        <div
                             className={`absolute left-[101%] top-0 border bg-white ${isZooming && isDesktop ? 'block' : 'hidden'} pointer-events-none`}
                             style={{
                                 width: `${ZOOM_BOX_SIZE}px`,
@@ -186,13 +209,13 @@ export default function ProductDetailPage() {
                             </button>
                             <div className="flex-1 grid grid-cols-4 gap-2">
                                 {images.map((src, index) => (
-                                    <img 
-                                        key={index} 
-                                        src={src} 
-                                        alt={`Thumbnail ${index + 1}`} 
+                                    <img
+                                        key={index}
+                                        src={src}
+                                        alt={`Thumbnail ${index + 1}`}
                                         className={`w-full h-auto object-cover border-2 cursor-pointer aspect-square
-                                                    ${selectedImageIndex === index ? 'border-orange-500' : 'border-transparent'}`} 
-                                        onClick={() => setSelectedImageIndex(index)} 
+                                                    ${selectedImageIndex === index ? 'border-orange-500' : 'border-transparent'}`}
+                                        onClick={() => setSelectedImageIndex(index)}
                                     />
                                 ))}
                             </div>
@@ -226,29 +249,30 @@ export default function ProductDetailPage() {
                         <div className="flex flex-col gap-4">
                             {/* Hàng 1: LUÔN LÀ LABEL */}
                             <label className="font-semibold">Số lượng:</label>
-                            
+
                             {/* Hàng 2: INPUT (Chỉ Mobile) */}
-                            <input 
-                                type="number" 
+                            <input
+                                type="number"
                                 value={quantity}
                                 onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                                 className="w-full h-12 text-center border border-gray-300 rounded-full md:hidden" // Chỉ hiện trên mobile
                                 min="1"
                             />
-                            
+
                             {/* Hàng 3: INPUT + BUTTONS (Desktop) HOẶC BUTTONS (Mobile) */}
                             <div className="flex flex-row gap-2 w-full">
                                 {/* Input cho Desktop */}
-                                <input 
-                                    type="number" 
+                                <input
+                                    type="number"
                                     value={quantity}
                                     onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                                     className="hidden md:block w-20 h-12 text-center border border-gray-300 rounded-full" // Chỉ hiện trên desktop
                                     min="1"
                                 />
-                                
+
                                 {/* Các nút bấm (chung) */}
-                                <button 
+                                <button
+                                    onClick={handleAddToCart}
                                     className="flex-1 h-12 bg-[#703fc8] text-white font-semibold rounded-full uppercase 
                                                hover:bg-opacity-90 transition-all text-sm cursor-pointer"
                                 >
@@ -260,7 +284,7 @@ export default function ProductDetailPage() {
                             </div>
                         </div>
                         {/* -------------------------------------------------- */}
-                        
+
                         <hr className="my-6 border-t border-gray-300 md:hidden" />
 
                         <div className="mt-6">
