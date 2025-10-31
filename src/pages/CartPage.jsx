@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { useCart } from '../context/cartContext';
-// import QuantityInput from '../components/common/QuantityInput';
+
 import { ChevronLeft } from 'lucide-react';
 
 const CartPage = () => {
@@ -15,7 +15,7 @@ const CartPage = () => {
     const handleQuantityChange = (item, newQuantity) => {
         const quantityNum = parseInt(newQuantity, 10);
         if (quantityNum > 0) {
-            updateQuantity(item.id, item.size, quantityNum); // (Lưu ý: hàm updateQuantity này chưa xử lý size)
+            updateQuantity(item.id, item.size, quantityNum); 
         } else {
             updateQuantity(item.id, item.size, 1); // Giữ ít nhất là 1
         }
