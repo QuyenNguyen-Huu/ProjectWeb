@@ -163,26 +163,6 @@ export default function ProductDetailPage() {
         }
     }, [selectedImageIndex, isDesktop]); // Chạy mỗi khi ảnh được chọn thay đổi
 
-    // --- LOGIC LỌC SẢN PHẨM LIÊN QUAN (ĐÃ THÊM) ---
-    const relatedProducts = useMemo(() => {
-        // Yêu cầu: Cùng thể loại (Lấy 'Đồ Nam' từ breadcrumb 'Men')
-        const currentCategoryTitle = "Đồ Nam"; 
-        
-        const targetCollection = mockCollections.find(
-            c => c.title === currentCategoryTitle
-        );
-
-        if (!targetCollection) return [];
-
-        // Yêu cầu: Không trùng lặp
-        // Lọc dựa trên `productName` lấy từ slug (state)
-        return targetCollection.products.filter(
-            p => p.title.toLowerCase() !== productName.toLowerCase()
-        );
-
-    }, [productName]); // Chạy lại khi productName (từ slug) thay đổi
-    // ----------------------------------------------------
-
     // --- Handlers ---
     // (Desktop thumbs handlers... cần 'product')
     const totalImages = product ? product.images_detail.length : 0;
