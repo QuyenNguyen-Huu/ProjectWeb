@@ -3,6 +3,10 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import useIsDesktop from "@/hooks/useIsDesktop";
 import Breadcrumb from "@/features/products/Categories-Products/Breadcrumb";
+// --- PopUp ---
+import mockCollections from "@/features/home/Collections/data/mockCollections"; 
+import RelatedProducts from '@/components/common/RelatedProducts'; 
+
 import { useCart } from '../context/cartContext';
 // Import "database"
 import { ALL_PRODUCTS, CLOTHING_SIZE_CHART_HTML, SHOES_SIZE_CHART_HTML } from '@/data/products';
@@ -24,7 +28,6 @@ const generateCompositionHtml = (product) => {
         if (!items || items.length === 0) return '<li>Đang cập nhật...</li>';
         return items.map(item => `<li>- ${item}</li>`).join('');
     };
-
     return `
       <table class="w-full text-left border-collapse border border-gray-300">
         <tbody>
@@ -159,6 +162,26 @@ export default function ProductDetailPage() {
             });
         }
     }, [selectedImageIndex, isDesktop]); // Chạy mỗi khi ảnh được chọn thay đổi
+
+    // --- LOGIC LỌC SẢN PHẨM LIÊN QUAN (ĐÃ THÊM) ---
+    const relatedProducts = useMemo(() => {
+        // Yêu cầu: Cùng thể loại (Lấy 'Đồ Nam' từ breadcrumb 'Men')
+        const currentCategoryTitle = "Đồ Nam"; 
+        
+        const targetCollection = mockCollections.find(
+            c => c.title === currentCategoryTitle
+        );
+
+        if (!targetCollection) return [];
+
+        // Yêu cầu: Không trùng lặp
+        // Lọc dựa trên `productName` lấy từ slug (state)
+        return targetCollection.products.filter(
+            p => p.title.toLowerCase() !== productName.toLowerCase()
+        );
+
+    }, [productName]); // Chạy lại khi productName (từ slug) thay đổi
+    // ----------------------------------------------------
 
     // --- Handlers ---
     // (Desktop thumbs handlers... cần 'product')
@@ -486,7 +509,6 @@ export default function ProductDetailPage() {
                     )}
                 </div>
             </section>
-
             {/* --- Sản phẩm liên quan --- */}
             {relatedProducts.length > 0 && (
                 <section className="py-16">
