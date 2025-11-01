@@ -93,7 +93,7 @@ const SidebarCategories = () => {
                 <hr className="my-4 border-gray-300 cursor-pointer select-none focus:outline-none" />
                 <aside className='mb-5 pb-2'>
                     <div className="relative flex items-start justify-between text-2xl font-semibold text-center uppercase mt-4 mb-2.5">
-                        <h2 className="mt-0 text-[18px] mb-4 font-semibold inline-block pr-2.5 text-[#363636] decoration-0 ">Giá</h2>
+                        <h2 className="mt-0 text-[18px] mb-4 font-semibold inline-block pr-2.5 text-[#363636] decoration-0 ">Kích cỡ</h2>
                         <span className="icon-dropdown cate-box flex mt-1 cursor-pointer select-none focus:outline-none "
                             onClick={() => toggleSection("size")}>
                             <i className="fa fa-angle-up "></i>

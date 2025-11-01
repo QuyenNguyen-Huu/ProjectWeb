@@ -33,7 +33,7 @@ const CategoryDescription = ({ description }) => {
 
   return (
     
-    <div className="w-full py-8 px-4 text-gray-300">
+    <div className="w-full py-8 px-4 text-gray-300 bg-white">
       
       {/* Container chứa nội dung: */}
       <div 
@@ -49,13 +49,7 @@ const CategoryDescription = ({ description }) => {
           dangerouslySetInnerHTML={{ __html: description }}
         />
 
-        {/* Hiệu ứng mờ (fade) ở dưới đáy khi chưa mở rộng
-          Chỉ hiển thị khi cần cắt bớt (needsTruncation) VÀ chưa mở rộng (!isExpanded)
-        */}
-        {needsTruncation && !isExpanded && (
-          // Đổi 'from-gray-900' thành màu nền của bạn (ví dụ: from-black)
-          <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#222] to-transparent pointer-events-none"></div>
-        )}
+
       </div>
 
       {/* Nút "Đọc thêm"
