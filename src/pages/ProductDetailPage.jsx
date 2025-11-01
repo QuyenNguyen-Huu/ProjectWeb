@@ -215,13 +215,14 @@ export default function ProductDetailPage() {
     // (Mobile image handlers... cần 'totalImages')
     const handlePrevImage = () => setSelectedImageIndex(prev => Math.max(0, prev - 1));
     const handleNextImage = () => setSelectedImageIndex(prev => Math.min(totalImages - 1, prev + 1));
+    
     // --- Handlers cho Ô số lượng ---
-    // Hàm helper để xác thực và cập nhật
     const updateQuantity = (newVal) => {
         const numQty = parseInt(newVal, 10);
+        
         if (isNaN(numQty) || numQty < 1) {
-            // Nếu rỗng, NaN, hoặc 0 -> quay về 1 (hoặc giá trị cũ)
-            setQuantity(quantity); // Giữ giá trị cũ đã được xác thực
+            // Nếu rỗng, NaN, hoặc 0 -> quay về giá trị cũ đã xác thực
+            setQuantity(quantity); 
             setQuantityInput(String(quantity));
         } else {
             // Nếu là số hợp lệ
@@ -233,53 +234,31 @@ export default function ProductDetailPage() {
     const handleQuantityChange = (e) => {
         const value = e.target.value;
         const numericValue = value.replace(/[^0-9]/g, '');
-        setQuantityInput(numericValue); // Cho phép chuỗi rỗng
+        setQuantityInput(numericValue);
     };
 
     const handleQuantityBlur = () => {
-        // Khi click ra ngoài, xác thực giá trị
         updateQuantity(quantityInput);
     };
     
     const handleQuantityKeyDown = (e) => {
         if (e.key === 'Enter') {
-            e.preventDefault();
-            e.target.blur(); // Kích hoạt onBlur
+            e.preventDefault(); // Ngăn form submit (nếu có)
+            e.target.blur(); // Kích hoạt sự kiện onBlur
         }
     };
 
-    // (Quantity handlers... không đổi)
-    const updateQuantity = (newVal) => {
-        const numQty = parseInt(newVal, 10);
-        if (isNaN(numQty) || numQty < 1) {
-            setQuantity(quantity); 
-            setQuantityInput(String(quantity));
-        } else {
-            setQuantity(numQty);
-            setQuantityInput(String(numQty));
-        }
-    };
-    const handleQuantityChange = (e) => {
-        const value = e.target.value;
-        const numericValue = value.replace(/[^0-9]/g, '');
-        setQuantityInput(numericValue);
-    };
-    const handleQuantityBlur = () => {
-        updateQuantity(quantityInput);
-    };
-    const handleQuantityKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            e.target.blur();
-        }
-    };
+    // Hàm cho nút bấm '+'
     const handleIncrement = () => {
         const newQty = quantity + 1;
         setQuantity(newQty);
         setQuantityInput(String(newQty));
     };
+
+    // Hàm cho nút bấm '-'
     const handleDecrement = () => {
-        const newQty = Math.max(1, quantity - 1);
+        // Dùng `quantity` (giá trị đã xác thực) để tính toán
+        const newQty = Math.max(1, quantity - 1); // Đảm bảo không xuống dưới 1
         setQuantity(newQty);
         setQuantityInput(String(newQty));
     };
