@@ -1,7 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import useIsDesktop from "@/hooks/useIsDesktop";
 import Breadcrumb from "@/features/products/Categories-Products/Breadcrumb";
+
+// --- CÁC IMPORT MỚI ĐƯỢC THÊM ---
+import mockCollections from "@/features/home/Collections/data/mockCollections"; 
+import RelatedProducts from '@/components/common/RelatedProducts'; 
+// ---------------------------------
 
 // --- Dữ liệu Mockup ---
 const mockProductData = {
@@ -86,6 +91,26 @@ export default function ProductDetailPage() {
         setThumbnailStartIndex(0);
     }, [productSlug]);
 
+    // --- LOGIC LỌC SẢN PHẨM LIÊN QUAN (ĐÃ THÊM) ---
+    const relatedProducts = useMemo(() => {
+        // Yêu cầu: Cùng thể loại (Lấy 'Đồ Nam' từ breadcrumb 'Men')
+        const currentCategoryTitle = "Đồ Nam"; 
+        
+        const targetCollection = mockCollections.find(
+            c => c.title === currentCategoryTitle
+        );
+
+        if (!targetCollection) return [];
+
+        // Yêu cầu: Không trùng lặp
+        // Lọc dựa trên `productName` lấy từ slug (state)
+        return targetCollection.products.filter(
+            p => p.title.toLowerCase() !== productName.toLowerCase()
+        );
+
+    }, [productName]); // Chạy lại khi productName (từ slug) thay đổi
+    // ----------------------------------------------------
+
     // --- Handlers ---
     const desktopThumbnailsVisible = 3;
     const isPrevDisabled = thumbnailStartIndex === 0;
@@ -161,7 +186,7 @@ export default function ProductDetailPage() {
                                     left: `${zoomPosition.x}px`,
                                     top: `${zoomPosition.y}px`,
                                     cursor: 'crosshair',
-                                    backgroundColor: 'rgba(100, 100, 100, 0.2)' // Opacity đã hoạt động
+                                    backgroundColor: 'rgba(100, 100, 100, 0.2)'
                                 }}
                             />
                         </div>
@@ -250,7 +275,7 @@ export default function ProductDetailPage() {
                                 {/* Các nút bấm (chung) */}
                                 <button 
                                     className="flex-1 h-12 bg-[#703fc8] text-white font-semibold rounded-full uppercase 
-                                               hover:bg-opacity-90 transition-all text-sm cursor-pointer"
+                                                hover:bg-opacity-90 transition-all text-sm cursor-pointer"
                                 >
                                     Thêm vào giỏ hàng
                                 </button>
@@ -286,6 +311,11 @@ export default function ProductDetailPage() {
                     <div className="mt-6 text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: description }}></div>
                 </div>
             </section>
+
+            {/* --- 4. PHẦN SẢN PHẨM LIÊN QUAN (ĐÃ THÊM) --- */}
+            <RelatedProducts products={relatedProducts} />
+            {/* --------------------------------------------- */}
+
         </div>
     );
 }
