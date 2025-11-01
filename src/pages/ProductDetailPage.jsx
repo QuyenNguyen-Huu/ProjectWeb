@@ -1,10 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+// --- Import useMemo, Carousel và Card ---
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import useIsDesktop from "@/hooks/useIsDesktop";
 import Breadcrumb from "@/features/products/Categories-Products/Breadcrumb";
 import { useCart } from '../context/cartContext';
-// --- Import "database" ---
+// Import "database"
 import { ALL_PRODUCTS, CLOTHING_SIZE_CHART_HTML, SHOES_SIZE_CHART_HTML } from '@/data/products';
+// Import components cho "Sản phẩm liên quan"
+import ProductCarousel from '@/components/common/ProductCarousel';
+import ProductCard from '@/components/common/ProductCard';
 
 // --- Cấu hình Zoom ---
 const LENS_SIZE = 180;
@@ -12,7 +16,7 @@ const ZOOM_BOX_SIZE = 500;
 const ZOOM_SCALE = ZOOM_BOX_SIZE / LENS_SIZE;
 // ---------------------
 
-// --- THAY ĐỔI 2: Hàm helper để tạo HTML ---
+// --- Hàm helper để tạo HTML ---
 // Hàm này tạo bảng HTML cho tab "Thành phần"
 const generateCompositionHtml = (product) => {
     // Helper để biến mảng thành <li>
@@ -26,8 +30,8 @@ const generateCompositionHtml = (product) => {
         <tbody>
           <tr class="border-b border-gray-300"><td class="p-2 border-r border-gray-300 font-semibold w-1/3">Tên sản phẩm</td><td class="p-2">${product.name}</td></tr>
           <tr class="border-b border-gray-300"><td class="p-2 border-r border-gray-300 font-semibold">Thương hiệu</td><td class="p-2">${product.brand}</td></tr>
-          <tr class="border-b border-gray-300"><td class="p-2 border-r border-gray-300 font-semibold">Kích cỡ</td><td class="p-2"><ul class="list-none">${createList(product.composition_content.size_details)}</ul></td></tr>
-          <tr><td class="p-2 border-r border-gray-300 font-semibold">Đặc điểm</td><td class="p-2"><ul class="list-none">${createList(product.composition_content.feature_details)}</ul></td></tr>
+          <tr class="border-b border-gray-300"><td class="p-2 border-r border-gray-300 font-semibold">Kích cỡ</td><td class="p-2"><ul class="list-none">${createList(product.sizes)}</ul></td></tr>
+          <tr><td class="p-2 border-r border-gray-300 font-semibold">Đặc điểm</td><td class="p-2"><ul class="list-none">${createList(product.highlights)}</ul></td></tr>
         </tbody>
       </table>
     `;
@@ -36,8 +40,6 @@ const generateCompositionHtml = (product) => {
 // Hàm này tạo HTML cho tab "Mô tả chi tiết"
 const generateDescriptionHtml = (product) => {
     let html = '';
-    
-    // 1. Lặp qua các đoạn mô tả
     product.description_content.forEach(item => {
         if (item.type === 'paragraph') {
             html += `<h4 class="font-bold text-lg my-3">${item.title}</h4><p class="mb-4">${item.content}</p>`;
@@ -45,14 +47,11 @@ const generateDescriptionHtml = (product) => {
             html += `<img src="${item.src}" alt="${item.alt || product.name}" class="my-4 w-full h-auto rounded" />`;
         }
     });
-
-    // 2. Thêm bảng size dựa trên category
     if (product.category === 'clothing') {
         html += CLOTHING_SIZE_CHART_HTML;
     } else if (product.category === 'shoes') {
         html += SHOES_SIZE_CHART_HTML;
     }
-    
     return html;
 };
 // ----------------------------------------
@@ -84,6 +83,25 @@ export default function ProductDetailPage() {
     const mobileScrollContainerRef = useRef(null);
     
     const { addToCart } = useCart();
+    // Logic lọc sản phẩm liên quan
+    const relatedProducts = useMemo(() => {
+        if (!product) return [];
+
+        return ALL_PRODUCTS
+            // R2: Lọc sản phẩm cùng category
+            .filter(p => p.category === product.category)
+            // R1: Lọc bỏ chính sản phẩm đang xem
+            .filter(p => p.slug !== product.slug)
+            .map(p => ({
+                id: p.id,
+                title: p.name,
+                href: `/${p.slug}.html`,
+                images: p.images_card,
+                price: p.price,
+                oldPrice: p.oldPrice,
+                salePercent: p.salePercent,
+            }));
+    }, [product]);
 
     // --- Effects ---
     useEffect(() => {
@@ -218,7 +236,7 @@ export default function ProductDetailPage() {
         setQuantityInput(String(newQty));
     };
     
-    // --- THAY ĐỔI 6: Xử lý nếu không tìm thấy sản phẩm ---
+    // --- Xử lý nếu không tìm thấy sản phẩm ---
     if (!product) {
         return (
             <div className={`${isDesktop ? 'mt-[80px]' : 'mt-[54px]'} container mx-auto px-4 py-8 text-center`}>
@@ -229,10 +247,9 @@ export default function ProductDetailPage() {
         );
     }
     
-    // --- THAY ĐỔI 7: Tạo HTML động cho tab ---
+    // --- Tạo HTML động cho tab ---
     const descriptionHtml = generateDescriptionHtml(product);
     const compositionHtml = generateCompositionHtml(product);
-    // ------------------------------------------
 
     // --- Render ---
     return (
@@ -439,6 +456,30 @@ export default function ProductDetailPage() {
                     )}
                 </div>
             </section>
+
+            {/* --- Sản phẩm liên quan --- */}
+            {relatedProducts.length > 0 && (
+                <section className="py-16">
+                    <div className="collection_container">
+                        <h2 className="section-title">Sản phẩm liên quan</h2>
+                        <ProductCarousel>
+                            {relatedProducts.map((relatedProduct) => (
+                                <div key={relatedProduct.id} className="product-carousel-item">
+                                    <ProductCard
+                                        href={relatedProduct.href}
+                                        title={relatedProduct.title}
+                                        images={relatedProduct.images}
+                                        price={relatedProduct.price}
+                                        oldPrice={relatedProduct.oldPrice}
+                                        salePercent={relatedProduct.salePercent}
+                                        showAddToCart={false} // Giống như SaleProducts
+                                    />
+                                </div>
+                            ))}
+                        </ProductCarousel>
+                    </div>
+                </section>
+            )}
         </div>
     );
 }
