@@ -1,51 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+// --- Import useMemo, Carousel và Card ---
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import useIsDesktop from "@/hooks/useIsDesktop";
 import Breadcrumb from "@/features/products/Categories-Products/Breadcrumb";
-
-// --- Dữ liệu Mockup ---
-const mockProductData = {
-    brand: "Zoot",
-    sku: "SV-ZFT350990",
-    price: "6,990,000 VNĐ",
-    sizes: ["S", "M"], 
-    images: [
-        "https://pos.nvncdn.com/be3294-43017/ps/20251020_RTBesDbTCn.jpeg?v=1760934854",
-        "https://pos.nvncdn.com/be3294-43017/ps/20251018_llY0feKjFK.jpeg?v=1760771662",
-        "https://pos.nvncdn.com/be3294-43017/ps/20251018_EGa4aTsdxm.jpeg?v=1760771660",
-        "https://pos.nvncdn.com/be3294-43017/ps/20251018_oL1U7S0BeY.jpeg?v=1760771664",
-        // --- THAY ĐỔI 1: Thêm ảnh để test scroll mobile ---
-        "https://pos.nvncdn.com/be3294-43017/ps/20251020_RTBesDbTCn.jpeg?v=1760934854", // 4 (ảnh 5)
-        "https://pos.nvncdn.com/be3294-43017/ps/20251018_llY0feKjFK.jpeg?v=1760771662"  // 5 (ảnh 6)
-    ],
-    highlights: [ "Vento Aero Fabric...", "Cool Storage Pockets...", /* ... */ ],
-    description: `
-        <p><strong>Mô tả sản phẩm:</strong></p>
-        <ul class="list-disc list-inside space-y-1 mb-4">
-            <li>Trọng lượng: 140g</li>
-            <li>Nhẹ</li>
-            <li>Thoáng khí</li>
-        </ul>
-        <p><strong>Tính năng nổi bật:</strong></p>
-        <ul class="list-disc list-inside space-y-1 mb-4">
-            <li>Cổ áo khóa kéo nửa thân</li>
-            <li>1 túi khóa kéo bên hông</li>
-        </ul>
-        <p><strong>Chất liệu:</strong></p>
-        <ul class="list-disc list-inside space-y-1 mb-4">
-            <li>80% Polyester tái chế</li>
-        </ul>
-        <p><strong>Hướng dẫn bảo quản:</strong></p>
-        <ul class="list-disc list-inside space-y-1">
-            <li>Không giặt ở nhiệt độ trên 30°C</li>
-            <li>Không sấy khô</li>
-            <li>Không dùng nước xả vải</li>
-            <li>Không ủi</li>
-            <li>Không giặt khô</li>
-        </ul>
-    `
-};
-// -----------------------
+import { useCart } from '../context/cartContext';
+// Import "database"
+import { ALL_PRODUCTS, CLOTHING_SIZE_CHART_HTML, SHOES_SIZE_CHART_HTML } from '@/data/products';
+// Import components cho "Sản phẩm liên quan"
+import ProductCarousel from '@/components/common/ProductCarousel';
+import ProductCard from '@/components/common/ProductCard';
 
 // --- Cấu hình Zoom ---
 const LENS_SIZE = 180;
@@ -53,49 +16,132 @@ const ZOOM_BOX_SIZE = 500;
 const ZOOM_SCALE = ZOOM_BOX_SIZE / LENS_SIZE;
 // ---------------------
 
+// --- Hàm helper để tạo HTML ---
+// Hàm này tạo bảng HTML cho tab "Thành phần"
+const generateCompositionHtml = (product) => {
+    // Helper để biến mảng thành <li>
+    const createList = (items) => {
+        if (!items || items.length === 0) return '<li>Đang cập nhật...</li>';
+        return items.map(item => `<li>- ${item}</li>`).join('');
+    };
+
+    return `
+      <table class="w-full text-left border-collapse border border-gray-300">
+        <tbody>
+          <tr class="border-b border-gray-300"><td class="p-2 border-r border-gray-300 font-semibold w-1/3">Tên sản phẩm</td><td class="p-2">${product.name}</td></tr>
+          <tr class="border-b border-gray-300"><td class="p-2 border-r border-gray-300 font-semibold">Thương hiệu</td><td class="p-2">${product.brand}</td></tr>
+          <tr class="border-b border-gray-300"><td class="p-2 border-r border-gray-300 font-semibold">Kích cỡ</td><td class="p-2"><ul class="list-none">${createList(product.sizes)}</ul></td></tr>
+          <tr><td class="p-2 border-r border-gray-300 font-semibold">Đặc điểm</td><td class="p-2"><ul class="list-none">${createList(product.highlights)}</ul></td></tr>
+        </tbody>
+      </table>
+    `;
+};
+
+// Hàm này tạo HTML cho tab "Mô tả chi tiết"
+const generateDescriptionHtml = (product) => {
+    let html = '';
+    product.description_content.forEach(item => {
+        if (item.type === 'paragraph') {
+            html += `<h4 class="font-bold text-lg my-3">${item.title}</h4><p class="mb-4">${item.content}</p>`;
+        } else if (item.type === 'image') {
+            html += `<img src="${item.src}" alt="${item.alt || product.name}" class="my-4 w-full h-auto rounded" />`;
+        }
+    });
+    if (product.category === 'clothing') {
+        html += CLOTHING_SIZE_CHART_HTML;
+    } else if (product.category === 'shoes') {
+        html += SHOES_SIZE_CHART_HTML;
+    }
+    return html;
+};
+// ----------------------------------------
+
 export default function ProductDetailPage() {
     const isDesktop = useIsDesktop();
     const { productSlug } = useParams();
-    
+
+    // Tìm sản phẩm dựa trên slug, bỏ ".html"
+    const cleanSlug = productSlug.replace(/.html$/, '');
+    const product = ALL_PRODUCTS.find(p => p.slug === cleanSlug);
+
     // --- State ---
     const [productName, setProductName] = useState('');
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-    const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0); 
-    const [selectedSize, setSelectedSize] = useState(mockProductData.sizes[0]);
-    
-    // --- THAY ĐỔI 2: State cho ô số lượng ---
-    const [quantity, setQuantity] = useState(1); // State lưu giá trị đã xác thực
-    const [quantityInput, setQuantityInput] = useState(String(quantity)); // State lưu giá trị đang nhập (string)
-
+    const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
+    const [selectedSize, setSelectedSize] = useState('');
+    const [quantity, setQuantity] = useState(1);
+    const [quantityInput, setQuantityInput] = useState(String(quantity));
     const [breadcrumbItems, setBreadcrumbItems] = useState([]);
     const [isZooming, setIsZooming] = useState(false);
     const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
     const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
     const [bgPosition, setBgPosition] = useState({ x: 0, y: 0 });
-    
-    // --- Refs ---
-    const mainImageRef = useRef(null);
-    // --- THAY ĐỔI 1: Ref cho mobile gallery scroll ---
-    const mobileScrollContainerRef = useRef(null);
+    const [activeTab, setActiveTab] = useState('description');
 
-    const { images, sizes, brand, sku, price, highlights, description } = mockProductData;
-    const totalImages = images.length;
+    const mainImageRef = useRef(null);
+    const mobileScrollContainerRef = useRef(null);
+    
+    const { addToCart } = useCart();
+    // Logic lọc sản phẩm liên quan
+    const relatedProducts = useMemo(() => {
+        if (!product) return [];
+
+        return ALL_PRODUCTS
+            // R2: Lọc sản phẩm cùng category
+            .filter(p => p.category === product.category)
+            // R1: Lọc bỏ chính sản phẩm đang xem
+            .filter(p => p.slug !== product.slug)
+            .map(p => ({
+                id: p.id,
+                title: p.name,
+                href: `/${p.slug}.html`,
+                images: p.images_card,
+                price: p.price,
+                oldPrice: p.oldPrice,
+                salePercent: p.salePercent,
+            }));
+    }, [product]);
 
     // --- Effects ---
     useEffect(() => {
-        window.scrollTo(0, 0);
-        let cleanedName = productSlug.replace(/-p\d+$/, '').replace(/-/g, ' ');
-        setProductName(cleanedName);
-        let breadcrumbName = cleanedName.charAt(0).toUpperCase() + cleanedName.slice(1);
-        if (breadcrumbName.length > 40) breadcrumbName = breadcrumbName.substring(0, 40) + '...';
-        setBreadcrumbItems([
-            { name: 'Trang chủ', link: '/' },
-            { name: 'Men', link: '/do-nam' }, 
-            { name: breadcrumbName, link: `/${productSlug}.html` }
-        ]);
-        setSelectedImageIndex(0);
-        setThumbnailStartIndex(0);
-    }, [productSlug]);
+        // --- THAY ĐỔI 4: Cập nhật Effect để dùng `product` ---
+        if (product) {
+            window.scrollTo(0, 0);
+            
+            // Lấy tên từ product
+            const cleanedName = product.name; 
+            setProductName(cleanedName);
+            
+            // Rút gọn tên cho breadcrumb
+            let breadcrumbName = cleanedName;
+            if (breadcrumbName.length > 40) breadcrumbName = breadcrumbName.substring(0, 40) + '...';
+            
+            setBreadcrumbItems([
+                { name: 'Trang chủ', link: '/' },
+                { name: 'Men', link: '/do-nam' }, // Cần logic tốt hơn nếu có category
+                { name: breadcrumbName, link: `/${product.slug}.html` }
+            ]);
+            
+            // Set size mặc định
+            if (product.sizes && product.sizes.length > 0) {
+                setSelectedSize(product.sizes[0]);
+            }
+            
+            setSelectedImageIndex(0);
+            setThumbnailStartIndex(0);
+        }
+    }, [product]); // Chạy lại khi 'product' thay đổi (tức là khi slug thay đổi)
+
+    useEffect(() => {
+        // ... (Effect cuộn gallery mobile... không đổi) ...
+        if (isDesktop || !mobileScrollContainerRef.current || !product) return;
+        const thumbnailEl = document.getElementById(`mobile-thumb-${selectedImageIndex}`);
+        if (thumbnailEl) {
+            thumbnailEl.scrollIntoView({
+                behavior: 'smooth', block: 'nearest', inline: 'nearest'
+            });
+        }
+    }, [selectedImageIndex, isDesktop, product]);
 
     // --- Effect để cuộn gallery mobile ---
     useEffect(() => {
@@ -115,13 +161,34 @@ export default function ProductDetailPage() {
     }, [selectedImageIndex, isDesktop]); // Chạy mỗi khi ảnh được chọn thay đổi
 
     // --- Handlers ---
-    // Desktop Handler
+    // (Desktop thumbs handlers... cần 'product')
+    const totalImages = product ? product.images_detail.length : 0;
     const desktopThumbnailsVisible = 3;
     const isPrevDisabled = thumbnailStartIndex === 0;
     const isNextDisabled = thumbnailStartIndex >= totalImages - desktopThumbnailsVisible;
     const handlePrevThumbnail = () => setThumbnailStartIndex(prev => Math.max(0, prev - 1));
     const handleNextThumbnail = () => setThumbnailStartIndex(prev => Math.min(totalImages - desktopThumbnailsVisible, prev + 1));
-    // Zoom Handler
+
+    // --- THAY ĐỔI 5: Cập nhật Add to Cart ---
+    const handleAddToCart = () => {
+        if (!product) return; // Không làm gì nếu không có sản phẩm
+
+        const productToAdd = {
+            id: product.slug, // Dùng slug làm ID
+            name: product.name,
+            price: product.price,
+            image: product.images_detail[0], // Lấy ảnh đầu tiên
+            size: selectedSize // Lấy size đã chọn từ state
+        };
+        
+        // Thêm số lượng (từ state)
+        for (let i = 0; i < quantity; i++) {
+            addToCart(productToAdd);
+        }
+        console.log(`Đã thêm ${quantity} x ${product.name} (Size: ${selectedSize}) vào giỏ!`);
+    };
+
+    // (Zoom handlers... không đổi)
     const handleMouseEnter = (e) => {
         if (!mainImageRef.current) return;
         const { width, height } = mainImageRef.current.getBoundingClientRect();
@@ -129,7 +196,6 @@ export default function ProductDetailPage() {
         setIsZooming(true);
     };
     const handleMouseLeave = () => setIsZooming(false);
-
     const handleMouseMove = (e) => {
         if (!mainImageRef.current || !isDesktop) {
             setIsZooming(false);
@@ -146,6 +212,7 @@ export default function ProductDetailPage() {
         setBgPosition({ x: -lensX * ZOOM_SCALE, y: -lensY * ZOOM_SCALE });
     };
 
+    // (Mobile image handlers... cần 'totalImages')
     const handlePrevImage = () => setSelectedImageIndex(prev => Math.max(0, prev - 1));
     const handleNextImage = () => setSelectedImageIndex(prev => Math.min(totalImages - 1, prev + 1));
     // --- Handlers cho Ô số lượng ---
@@ -181,21 +248,57 @@ export default function ProductDetailPage() {
         }
     };
 
-    // Hàm mới cho nút bấm
+    // (Quantity handlers... không đổi)
+    const updateQuantity = (newVal) => {
+        const numQty = parseInt(newVal, 10);
+        if (isNaN(numQty) || numQty < 1) {
+            setQuantity(quantity); 
+            setQuantityInput(String(quantity));
+        } else {
+            setQuantity(numQty);
+            setQuantityInput(String(numQty));
+        }
+    };
+    const handleQuantityChange = (e) => {
+        const value = e.target.value;
+        const numericValue = value.replace(/[^0-9]/g, '');
+        setQuantityInput(numericValue);
+    };
+    const handleQuantityBlur = () => {
+        updateQuantity(quantityInput);
+    };
+    const handleQuantityKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.target.blur();
+        }
+    };
     const handleIncrement = () => {
-        // Dùng `quantity` (giá trị đã xác thực) để tính toán
         const newQty = quantity + 1;
         setQuantity(newQty);
         setQuantityInput(String(newQty));
     };
-
     const handleDecrement = () => {
-        // Dùng `quantity` (giá trị đã xác thực) để tính toán
-        const newQty = Math.max(1, quantity - 1); // Đảm bảo không xuống dưới 1
+        const newQty = Math.max(1, quantity - 1);
         setQuantity(newQty);
         setQuantityInput(String(newQty));
     };
-    // ------------------------------------------
+    
+    // --- Xử lý nếu không tìm thấy sản phẩm ---
+    if (!product) {
+        return (
+            <div className={`${isDesktop ? 'mt-[80px]' : 'mt-[54px]'} container mx-auto px-4 py-8 text-center`}>
+                <h1 className="text-2xl font-bold">Không tìm thấy sản phẩm</h1>
+                <p className="mt-4">Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+                <a href="/" className="view-more-btn mt-6">Quay về trang chủ</a>
+            </div>
+        );
+    }
+    
+    // --- Tạo HTML động cho tab ---
+    const descriptionHtml = generateDescriptionHtml(product);
+    const compositionHtml = generateCompositionHtml(product);
+
     // --- Render ---
     return (
         <div className={`${isDesktop ? 'mt-[80px]' : 'mt-[54px]'} font-["Montserrat",sans-serif]`}>
@@ -204,80 +307,68 @@ export default function ProductDetailPage() {
             </section>
             <section className="products-container py-8">
                 <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-10">
-                    {/* --- COLUMN 1: IMAGE GALLERY --- */}
+                    {/* --- COLUMN 1: IMAGE GALLERY (Dùng product.images_detail) --- */}
                     <div className="relative flex flex-col lg:flex-row gap-4">
                         {/* Desktop Thumbs */}
                         <div className="hidden lg:flex lg:flex-col items-center gap-2">
                             <button onClick={handlePrevThumbnail} disabled={isPrevDisabled} className="p-2 text-lg disabled:opacity-30"><i className="fa fa-angle-up"></i></button>
                             <div className="flex flex-col gap-2">
-                                {images.slice(thumbnailStartIndex, thumbnailStartIndex + desktopThumbnailsVisible).map((src, i) => {
+                                {product.images_detail.slice(thumbnailStartIndex, thumbnailStartIndex + desktopThumbnailsVisible).map((src, i) => {
                                     const actualIndex = thumbnailStartIndex + i;
                                     return <img key={actualIndex} src={src} alt={`Thumbnail ${actualIndex + 1}`} className={`w-24 h-24 object-cover border-2 transition-all cursor-pointer ${selectedImageIndex === actualIndex ? 'border-orange-500' : 'border-gray-200 hover:border-gray-400'}`} onClick={() => setSelectedImageIndex(actualIndex)} />;
                                 })}
                             </div>
                             <button onClick={handleNextThumbnail} disabled={isNextDisabled} className="p-2 text-lg disabled:opacity-30"><i className="fa fa-angle-down"></i></button>
                         </div>
-
                         {/* Main Image */}
-                        <div 
+                        <div
                             className="w-full relative order-first lg:order-none flex-1"
                             ref={mainImageRef}
                             onMouseEnter={handleMouseEnter}
                             onMouseLeave={handleMouseLeave}
                             onMouseMove={handleMouseMove}
                         >
-                            <img src={images[selectedImageIndex]} alt="Main product" className="w-full h-auto object-cover border" />
-
-                            {/* Ống kính (Lens) */}
-                            <div 
+                            <img src={product.images_detail[selectedImageIndex]} alt="Main product" className="w-full h-auto object-cover border" />
+                            <div
                                 className={`absolute border-2 border-gray-400 ${isZooming && isDesktop ? 'block' : 'hidden'} pointer-events-none`}
                                 style={{
-                                    width: `${LENS_SIZE}px`,
-                                    height: `${LENS_SIZE}px`,
-                                    left: `${zoomPosition.x}px`,
-                                    top: `${zoomPosition.y}px`,
-                                    cursor: 'crosshair',
-                                    backgroundColor: 'rgba(100, 100, 100, 0.2)' // Opacity đã hoạt động
+                                    width: `${LENS_SIZE}px`, height: `${LENS_SIZE}px`,
+                                    left: `${zoomPosition.x}px`, top: `${zoomPosition.y}px`,
+                                    cursor: 'crosshair', backgroundColor: 'rgba(100, 100, 100, 0.2)'
                                 }}
                             />
                         </div>
-
-                        {/* Khung Zoom (chỉ hiển thị trên desktop) */}
-                        <div 
+                        {/* Khung Zoom */}
+                        <div
                             className={`absolute left-[101%] top-0 border bg-white ${isZooming && isDesktop ? 'block' : 'hidden'} pointer-events-none`}
                             style={{
-                                width: `${ZOOM_BOX_SIZE}px`,
-                                height: `${ZOOM_BOX_SIZE}px`,
-                                backgroundImage: `url(${images[selectedImageIndex]})`,
+                                width: `${ZOOM_BOX_SIZE}px`, height: `${ZOOM_BOX_SIZE}px`,
+                                backgroundImage: `url(${product.images_detail[selectedImageIndex]})`,
                                 backgroundRepeat: 'no-repeat',
                                 backgroundSize: `${imgDimensions.width * ZOOM_SCALE}px ${imgDimensions.height * ZOOM_SCALE}px`,
                                 backgroundPosition: `${bgPosition.x}px ${bgPosition.y}px`
                             }}
                         />
-
-                        {/* --- Mobile Thumbs --- */}
+                        {/* Mobile Thumbs */}
                         <div className="lg:hidden w-full order-2 mt-2 flex items-center">
                             {/* Nút lùi (trái) */}
                             <button onClick={handlePrevImage} disabled={selectedImageIndex === 0} className="p-2 rounded-full disabled:opacity-30">
                                 <i className="fa fa-angle-left"></i>
                             </button>
-
-                            {/* Container cuộn */}
                             <div 
                                 ref={mobileScrollContainerRef} 
                                 className="flex-1 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                             >
-                                {/* Wrapper cho các ảnh */}
                                 <div className="flex flex-nowrap gap-2 px-1">
-                                    {images.map((src, index) => (
+                                    {product.images_detail.map((src, index) => (
                                         <img 
-                                            id={`mobile-thumb-${index}`} // Thêm ID để JS tìm thấy
+                                            id={`mobile-thumb-${index}`} 
                                             key={index} 
                                             src={src} 
                                             alt={`Thumbnail ${index + 1}`} 
                                             className={`h-auto object-cover border-2 cursor-pointer aspect-square flex-shrink-0
                                                         ${selectedImageIndex === index ? 'border-orange-500' : 'border-transparent'}`} 
-                                            style={{ width: '25%' }} // Mỗi ảnh chiếm 1/4 (25%)
+                                            style={{ width: '25%' }} 
                                             onClick={() => setSelectedImageIndex(index)} 
                                         />
                                     ))}
@@ -291,19 +382,19 @@ export default function ProductDetailPage() {
                         </div>
                     </div>
 
-                    {/* --- COLUMN 2: PRODUCT INFO --- */}
+                    {/* --- COLUMN 2: PRODUCT INFO (Dùng product. ...) --- */}
                     <div className="w-full mt-6 lg:mt-0 order-3">
-                        <h1 className="text-[26px] uppercase font-semibold mb-3 leading-tight">{productName}</h1>
+                        <h1 className="text-[26px] uppercase font-semibold mb-3 leading-tight">{product.name}</h1>
                         <div className="flex items-center text-sm text-gray-600 mb-4">
-                            <span>Thương hiệu: <span className="font-semibold text-gray-800">{brand}</span></span>
+                            <span>Thương hiệu: <span className="font-semibold text-gray-800">{product.brand}</span></span>
                             <span className="mx-2 text-gray-300">|</span>
-                            <span>Mã SP: <span className="font-semibold text-gray-800">{sku}</span></span>
+                            <span>Mã SP: <span className="font-semibold text-gray-800">{product.sku}</span></span>
                         </div>
-                        <div className="text-3xl font-bold text-gray-900 mb-6">{price}</div>
+                        <div className="text-3xl font-bold text-gray-900 mb-6">{product.price}</div>
                         <div className="mb-6">
                             <label className="block text-md font-semibold mb-2">Chọn size:</label>
                             <div className="flex gap-2">
-                                {sizes.map(size => (
+                                {product.sizes.map(size => (
                                     <button key={size} onClick={() => setSelectedSize(size)} className={`w-12 h-12 border rounded transition-colors hover:border-orange-500 focus:border-orange-500 focus:outline-none ${selectedSize === size ? 'border-orange-500 border-2' : 'border-gray-300'}`}>
                                         {size}
                                     </button>
@@ -311,55 +402,25 @@ export default function ProductDetailPage() {
                             </div>
                         </div>
 
-                        {/* --- Quantity & Actions --- */}
+                        {/* Quantity & Actions (Không đổi) */}
                         <div className="flex flex-col gap-4">
                             <label className="font-semibold">Số lượng:</label>
-                            
-                            {/* Input cho Mobile */}
                             <div className="relative w-full md:hidden">
-                                <input 
-                                    type="text" 
-                                    inputMode="numeric" 
-                                    value={quantityInput}
-                                    onChange={handleQuantityChange}
-                                    onBlur={handleQuantityBlur}
-                                    onKeyDown={handleQuantityKeyDown}
-                                    className="w-full h-12 text-center border border-gray-300 rounded-full pr-10" // Thêm pr-10
-                                />
+                                <input type="text" inputMode="numeric" value={quantityInput} onChange={handleQuantityChange} onBlur={handleQuantityBlur} onKeyDown={handleQuantityKeyDown} className="w-full h-12 text-center border border-gray-300 rounded-full pr-10" />
                                 <div className="absolute right-2 top-0 h-full flex flex-col justify-center">
-                                    <button type="button" onClick={handleIncrement} className="text-gray-600 h-1/2 flex items-center justify-center px-1">
-                                        <i className="fa fa-angle-up text-xs"></i>
-                                    </button>
-                                    <button type="button" onClick={handleDecrement} className="text-gray-600 h-1/2 flex items-center justify-center px-1">
-                                        <i className="fa fa-angle-down text-xs"></i>
-                                    </button>
+                                    <button type="button" onClick={handleIncrement} className="text-gray-600 h-1/2 flex items-center justify-center px-1"><i className="fa fa-angle-up text-xs"></i></button>
+                                    <button type="button" onClick={handleDecrement} className="text-gray-600 h-1/2 flex items-center justify-center px-1"><i className="fa fa-angle-down text-xs"></i></button>
                                 </div>
                             </div>
-                            
                             <div className="flex flex-row gap-2 w-full">
-                                {/* Input cho Desktop */}
                                 <div className="relative hidden md:block w-20">
-                                    <input 
-                                        type="text" 
-                                        inputMode="numeric" 
-                                        value={quantityInput}
-                                        onChange={handleQuantityChange}
-                                        onBlur={handleQuantityBlur}
-                                        onKeyDown={handleQuantityKeyDown}
-                                        className="w-full h-12 text-center border border-gray-300 rounded-full pr-6" // Thêm pr-6
-                                    />
+                                    <input type="text" inputMode="numeric" value={quantityInput} onChange={handleQuantityChange} onBlur={handleQuantityBlur} onKeyDown={handleQuantityKeyDown} className="w-full h-12 text-center border border-gray-300 rounded-full pr-6" />
                                     <div className="absolute right-1 top-0 h-full flex flex-col justify-center">
-                                        <button type="button" onClick={handleIncrement} className="text-gray-600 h-1/2 flex items-center justify-center px-1">
-                                            <i className="fa fa-angle-up text-xs"></i>
-                                        </button>
-                                        <button type="button" onClick={handleDecrement} className="text-gray-600 h-1/2 flex items-center justify-center px-1">
-                                            <i className="fa fa-angle-down text-xs"></i>
-                                        </button>
+                                        <button type="button" onClick={handleIncrement} className="text-gray-600 h-1/2 flex items-center justify-center px-1"><i className="fa fa-angle-up text-xs"></i></button>
+                                        <button type="button" onClick={handleDecrement} className="text-gray-600 h-1/2 flex items-center justify-center px-1"><i className="fa fa-angle-down text-xs"></i></button>
                                     </div>
                                 </div>
-                                
-                                {/* Các nút bấm (chung) */}
-                                <button className="flex-1 h-12 bg-[#703fc8] text-white font-semibold rounded-full uppercase hover:bg-opacity-90 transition-all text-sm cursor-pointer">
+                                <button onClick={handleAddToCart} className="flex-1 h-12 bg-[#703fc8] text-white font-semibold rounded-full uppercase hover:bg-opacity-90 transition-all text-sm cursor-pointer">
                                     Thêm vào giỏ hàng
                                 </button>
                                 <button className="w-12 h-12 border border-gray-300 rounded-full flex items-center justify-center flex-shrink-0 hover:border-gray-500 transition-all cursor-pointer" aria-label="Thêm vào yêu thích">
@@ -367,14 +428,14 @@ export default function ProductDetailPage() {
                                 </button>
                             </div>
                         </div>
-                        {/* -------------------------------------------------- */}
                         
                         <hr className="my-6 border-t border-gray-300 md:hidden" />
 
+                        {/* Đặc điểm nổi bật (Dùng product.highlights) */}
                         <div className="mt-6">
                             <h3 className="font-bold text-red-500 mb-3 text-lg">Đặc điểm nổi bật</h3>
                             <ul className="list-none space-y-2 text-gray-700">
-                                {highlights.map((item, index) => (
+                                {product.highlights.map((item, index) => (
                                     <li key={index}>- {item}</li>
                                 ))}
                             </ul>
@@ -382,18 +443,94 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
 
-                {/* --- 3. Detailed Description Section --- */}
+                {/* --- 3. Detailed Description Section (Đã sửa) --- */}
                 <div className="mt-16">
-                    <div className="border-b border-gray-300">
-                        <nav className="flex gap-4 -mb-px">
-                            <button className="py-3 px-1 md:px-4 border-b-2 border-[#703fc8] font-semibold text-sm md:text-base">Mô tả chi tiết</button>
-                            <button className="py-3 px-1 md:px-4 text-gray-600 hover:text-black border-b-2 border-transparent text-sm md:text-base">Bình luận</button>
-                            <button className="py-3 px-1 md:px-4 text-gray-600 hover:text-black border-b-2 border-transparent text-sm md:text-base">Thành phần</button>
-                        </nav>
-                    </div>
-                    <div className="mt-6 text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: description }}></div>
+                    {isDesktop ? (
+                        /* --- GIAO DIỆN DESKTOP --- */
+                        <div>
+                            <nav className="flex">
+                                <button
+                                    onClick={() => setActiveTab('description')}
+                                    className={`py-3 px-6 text-sm font-semibold transition-all border
+                                        ${activeTab === 'description' ? 'bg-[#673AB7] text-white border-[#673AB7]' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}
+                                >
+                                    Mô tả chi tiết
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('composition')}
+                                    className={`py-3 px-6 text-sm font-semibold transition-all border
+                                        ${activeTab === 'composition' ? 'bg-[#673AB7] text-white border-[#673AB7]' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}
+                                >
+                                    Thành phần
+                                </button>
+                            </nav>
+                            
+                            <div className="mt-0 text-gray-700 leading-relaxed border border-gray-300 p-4">
+                                {activeTab === 'description' && (
+                                    <div dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
+                                )}
+                                {activeTab === 'composition' && (
+                                    <div dangerouslySetInnerHTML={{ __html: compositionHtml }} />
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        /* --- GIAO DIỆN MOBILE --- */
+                        <div className="w-full">
+                            <div className="border-t border-gray-300">
+                                <button
+                                    onClick={() => setActiveTab(activeTab === 'description' ? null : 'description')}
+                                    className={`flex justify-between items-center w-full py-4 px-2
+                                        ${activeTab === 'description' ? 'text-[#673AB7]' : 'text-gray-800'}`}
+                                >
+                                    <span className="font-semibold">Mô tả chi tiết</span>
+                                    {activeTab !== 'description' && <i className="fa fa-angle-down text-gray-600"></i>}
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab(activeTab === 'composition' ? null : 'composition')}
+                                    className={`flex justify-between items-center w-full py-4 px-2 border-b border-gray-300
+                                        ${activeTab === 'composition' ? 'text-[#673AB7]' : 'text-gray-800'}`}
+                                >
+                                    <span className="font-semibold">Thành phần</span>
+                                    {activeTab !== 'composition' && <i className="fa fa-angle-down text-gray-600"></i>}
+                                </button>
+                            </div>
+                            <div className="mt-6 text-gray-700 leading-relaxed">
+                                {activeTab === 'description' && (
+                                    <div dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
+                                )}
+                                {activeTab === 'composition' && (
+                                    <div dangerouslySetInnerHTML={{ __html: compositionHtml }} />
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </section>
+
+            {/* --- Sản phẩm liên quan --- */}
+            {relatedProducts.length > 0 && (
+                <section className="py-16">
+                    <div className="collection_container">
+                        <h2 className="section-title">Sản phẩm liên quan</h2>
+                        <ProductCarousel>
+                            {relatedProducts.map((relatedProduct) => (
+                                <div key={relatedProduct.id} className="product-carousel-item">
+                                    <ProductCard
+                                        href={relatedProduct.href}
+                                        title={relatedProduct.title}
+                                        images={relatedProduct.images}
+                                        price={relatedProduct.price}
+                                        oldPrice={relatedProduct.oldPrice}
+                                        salePercent={relatedProduct.salePercent}
+                                        showAddToCart={false} // Giống như SaleProducts
+                                    />
+                                </div>
+                            ))}
+                        </ProductCarousel>
+                    </div>
+                </section>
+            )}
         </div>
     );
 }
