@@ -56,7 +56,6 @@ const generateDescriptionHtml = (product) => {
 };
 // ----------------------------------------
 
-
 export default function ProductDetailPage() {
     const isDesktop = useIsDesktop();
     const { productSlug } = useParams();
@@ -144,6 +143,23 @@ export default function ProductDetailPage() {
         }
     }, [selectedImageIndex, isDesktop, product]);
 
+    // --- Effect để cuộn gallery mobile ---
+    useEffect(() => {
+        // Chỉ chạy trên mobile và khi ref đã sẵn sàng
+        if (isDesktop || !mobileScrollContainerRef.current) return;
+
+        // Tìm ảnh thumbnail tương ứng
+        const thumbnailEl = document.getElementById(`mobile-thumb-${selectedImageIndex}`);
+        
+        if (thumbnailEl) {
+            thumbnailEl.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'nearest'
+            });
+        }
+    }, [selectedImageIndex, isDesktop]); // Chạy mỗi khi ảnh được chọn thay đổi
+
     // --- Handlers ---
     // (Desktop thumbs handlers... cần 'product')
     const totalImages = product ? product.images_detail.length : 0;
@@ -199,6 +215,38 @@ export default function ProductDetailPage() {
     // (Mobile image handlers... cần 'totalImages')
     const handlePrevImage = () => setSelectedImageIndex(prev => Math.max(0, prev - 1));
     const handleNextImage = () => setSelectedImageIndex(prev => Math.min(totalImages - 1, prev + 1));
+    // --- Handlers cho Ô số lượng ---
+    // Hàm helper để xác thực và cập nhật
+    const updateQuantity = (newVal) => {
+        const numQty = parseInt(newVal, 10);
+        if (isNaN(numQty) || numQty < 1) {
+            // Nếu rỗng, NaN, hoặc 0 -> quay về 1 (hoặc giá trị cũ)
+            setQuantity(quantity); // Giữ giá trị cũ đã được xác thực
+            setQuantityInput(String(quantity));
+        } else {
+            // Nếu là số hợp lệ
+            setQuantity(numQty);
+            setQuantityInput(String(numQty));
+        }
+    };
+
+    const handleQuantityChange = (e) => {
+        const value = e.target.value;
+        const numericValue = value.replace(/[^0-9]/g, '');
+        setQuantityInput(numericValue); // Cho phép chuỗi rỗng
+    };
+
+    const handleQuantityBlur = () => {
+        // Khi click ra ngoài, xác thực giá trị
+        updateQuantity(quantityInput);
+    };
+    
+    const handleQuantityKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.target.blur(); // Kích hoạt onBlur
+        }
+    };
 
     // (Quantity handlers... không đổi)
     const updateQuantity = (newVal) => {
@@ -303,6 +351,7 @@ export default function ProductDetailPage() {
                         />
                         {/* Mobile Thumbs */}
                         <div className="lg:hidden w-full order-2 mt-2 flex items-center">
+                            {/* Nút lùi (trái) */}
                             <button onClick={handlePrevImage} disabled={selectedImageIndex === 0} className="p-2 rounded-full disabled:opacity-30">
                                 <i className="fa fa-angle-left"></i>
                             </button>
@@ -325,6 +374,8 @@ export default function ProductDetailPage() {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Nút tiến (phải) */}
                             <button onClick={handleNextImage} disabled={selectedImageIndex === totalImages - 1} className="p-2 rounded-full disabled:opacity-30">
                                 <i className="fa fa-angle-right"></i>
                             </button>
