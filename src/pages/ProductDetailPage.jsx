@@ -13,7 +13,10 @@ const mockProductData = {
         "https://pos.nvncdn.com/be3294-43017/ps/20251020_RTBesDbTCn.jpeg?v=1760934854",
         "https://pos.nvncdn.com/be3294-43017/ps/20251018_llY0feKjFK.jpeg?v=1760771662",
         "https://pos.nvncdn.com/be3294-43017/ps/20251018_EGa4aTsdxm.jpeg?v=1760771660",
-        "https://pos.nvncdn.com/be3294-43017/ps/20251018_oL1U7S0BeY.jpeg?v=1760771664"
+        "https://pos.nvncdn.com/be3294-43017/ps/20251018_oL1U7S0BeY.jpeg?v=1760771664",
+        // --- THAY ĐỔI 1: Thêm ảnh để test scroll mobile ---
+        "https://pos.nvncdn.com/be3294-43017/ps/20251020_RTBesDbTCn.jpeg?v=1760934854", // 4 (ảnh 5)
+        "https://pos.nvncdn.com/be3294-43017/ps/20251018_llY0feKjFK.jpeg?v=1760771662"  // 5 (ảnh 6)
     ],
     highlights: [ "Vento Aero Fabric...", "Cool Storage Pockets...", /* ... */ ],
     description: `
@@ -59,13 +62,21 @@ export default function ProductDetailPage() {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0); 
     const [selectedSize, setSelectedSize] = useState(mockProductData.sizes[0]);
-    const [quantity, setQuantity] = useState(1);
+    
+    // --- THAY ĐỔI 2: State cho ô số lượng ---
+    const [quantity, setQuantity] = useState(1); // State lưu giá trị đã xác thực
+    const [quantityInput, setQuantityInput] = useState(String(quantity)); // State lưu giá trị đang nhập (string)
+
     const [breadcrumbItems, setBreadcrumbItems] = useState([]);
     const [isZooming, setIsZooming] = useState(false);
     const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
     const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
     const [bgPosition, setBgPosition] = useState({ x: 0, y: 0 });
+    
+    // --- Refs ---
     const mainImageRef = useRef(null);
+    // --- THAY ĐỔI 1: Ref cho mobile gallery scroll ---
+    const mobileScrollContainerRef = useRef(null);
 
     const { images, sizes, brand, sku, price, highlights, description } = mockProductData;
     const totalImages = images.length;
@@ -86,13 +97,31 @@ export default function ProductDetailPage() {
         setThumbnailStartIndex(0);
     }, [productSlug]);
 
+    // --- Effect để cuộn gallery mobile ---
+    useEffect(() => {
+        // Chỉ chạy trên mobile và khi ref đã sẵn sàng
+        if (isDesktop || !mobileScrollContainerRef.current) return;
+
+        // Tìm ảnh thumbnail tương ứng
+        const thumbnailEl = document.getElementById(`mobile-thumb-${selectedImageIndex}`);
+        
+        if (thumbnailEl) {
+            thumbnailEl.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'nearest'
+            });
+        }
+    }, [selectedImageIndex, isDesktop]); // Chạy mỗi khi ảnh được chọn thay đổi
+
     // --- Handlers ---
+    // Desktop Handler
     const desktopThumbnailsVisible = 3;
     const isPrevDisabled = thumbnailStartIndex === 0;
     const isNextDisabled = thumbnailStartIndex >= totalImages - desktopThumbnailsVisible;
     const handlePrevThumbnail = () => setThumbnailStartIndex(prev => Math.max(0, prev - 1));
     const handleNextThumbnail = () => setThumbnailStartIndex(prev => Math.min(totalImages - desktopThumbnailsVisible, prev + 1));
-
+    // Zoom Handler
     const handleMouseEnter = (e) => {
         if (!mainImageRef.current) return;
         const { width, height } = mainImageRef.current.getBoundingClientRect();
@@ -119,7 +148,54 @@ export default function ProductDetailPage() {
 
     const handlePrevImage = () => setSelectedImageIndex(prev => Math.max(0, prev - 1));
     const handleNextImage = () => setSelectedImageIndex(prev => Math.min(totalImages - 1, prev + 1));
+    // --- Handlers cho Ô số lượng ---
+    // Hàm helper để xác thực và cập nhật
+    const updateQuantity = (newVal) => {
+        const numQty = parseInt(newVal, 10);
+        if (isNaN(numQty) || numQty < 1) {
+            // Nếu rỗng, NaN, hoặc 0 -> quay về 1 (hoặc giá trị cũ)
+            setQuantity(quantity); // Giữ giá trị cũ đã được xác thực
+            setQuantityInput(String(quantity));
+        } else {
+            // Nếu là số hợp lệ
+            setQuantity(numQty);
+            setQuantityInput(String(numQty));
+        }
+    };
 
+    const handleQuantityChange = (e) => {
+        const value = e.target.value;
+        const numericValue = value.replace(/[^0-9]/g, '');
+        setQuantityInput(numericValue); // Cho phép chuỗi rỗng
+    };
+
+    const handleQuantityBlur = () => {
+        // Khi click ra ngoài, xác thực giá trị
+        updateQuantity(quantityInput);
+    };
+    
+    const handleQuantityKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.target.blur(); // Kích hoạt onBlur
+        }
+    };
+
+    // Hàm mới cho nút bấm
+    const handleIncrement = () => {
+        // Dùng `quantity` (giá trị đã xác thực) để tính toán
+        const newQty = quantity + 1;
+        setQuantity(newQty);
+        setQuantityInput(String(newQty));
+    };
+
+    const handleDecrement = () => {
+        // Dùng `quantity` (giá trị đã xác thực) để tính toán
+        const newQty = Math.max(1, quantity - 1); // Đảm bảo không xuống dưới 1
+        setQuantity(newQty);
+        setQuantityInput(String(newQty));
+    };
+    // ------------------------------------------
     // --- Render ---
     return (
         <div className={`${isDesktop ? 'mt-[80px]' : 'mt-[54px]'} font-["Montserrat",sans-serif]`}>
@@ -179,23 +255,36 @@ export default function ProductDetailPage() {
                             }}
                         />
 
-                        {/* Mobile Thumbs */}
+                        {/* --- Mobile Thumbs --- */}
                         <div className="lg:hidden w-full order-2 mt-2 flex items-center">
+                            {/* Nút lùi (trái) */}
                             <button onClick={handlePrevImage} disabled={selectedImageIndex === 0} className="p-2 rounded-full disabled:opacity-30">
                                 <i className="fa fa-angle-left"></i>
                             </button>
-                            <div className="flex-1 grid grid-cols-4 gap-2">
-                                {images.map((src, index) => (
-                                    <img 
-                                        key={index} 
-                                        src={src} 
-                                        alt={`Thumbnail ${index + 1}`} 
-                                        className={`w-full h-auto object-cover border-2 cursor-pointer aspect-square
-                                                    ${selectedImageIndex === index ? 'border-orange-500' : 'border-transparent'}`} 
-                                        onClick={() => setSelectedImageIndex(index)} 
-                                    />
-                                ))}
+
+                            {/* Container cuộn */}
+                            <div 
+                                ref={mobileScrollContainerRef} 
+                                className="flex-1 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                            >
+                                {/* Wrapper cho các ảnh */}
+                                <div className="flex flex-nowrap gap-2 px-1">
+                                    {images.map((src, index) => (
+                                        <img 
+                                            id={`mobile-thumb-${index}`} // Thêm ID để JS tìm thấy
+                                            key={index} 
+                                            src={src} 
+                                            alt={`Thumbnail ${index + 1}`} 
+                                            className={`h-auto object-cover border-2 cursor-pointer aspect-square flex-shrink-0
+                                                        ${selectedImageIndex === index ? 'border-orange-500' : 'border-transparent'}`} 
+                                            style={{ width: '25%' }} // Mỗi ảnh chiếm 1/4 (25%)
+                                            onClick={() => setSelectedImageIndex(index)} 
+                                        />
+                                    ))}
+                                </div>
                             </div>
+
+                            {/* Nút tiến (phải) */}
                             <button onClick={handleNextImage} disabled={selectedImageIndex === totalImages - 1} className="p-2 rounded-full disabled:opacity-30">
                                 <i className="fa fa-angle-right"></i>
                             </button>
@@ -222,36 +311,55 @@ export default function ProductDetailPage() {
                             </div>
                         </div>
 
-                        {/* Quantity & Actions */}
+                        {/* --- Quantity & Actions --- */}
                         <div className="flex flex-col gap-4">
-                            {/* Hàng 1: LUÔN LÀ LABEL */}
                             <label className="font-semibold">Số lượng:</label>
                             
-                            {/* Hàng 2: INPUT (Chỉ Mobile) */}
-                            <input 
-                                type="number" 
-                                value={quantity}
-                                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                className="w-full h-12 text-center border border-gray-300 rounded-full md:hidden" // Chỉ hiện trên mobile
-                                min="1"
-                            />
+                            {/* Input cho Mobile */}
+                            <div className="relative w-full md:hidden">
+                                <input 
+                                    type="text" 
+                                    inputMode="numeric" 
+                                    value={quantityInput}
+                                    onChange={handleQuantityChange}
+                                    onBlur={handleQuantityBlur}
+                                    onKeyDown={handleQuantityKeyDown}
+                                    className="w-full h-12 text-center border border-gray-300 rounded-full pr-10" // Thêm pr-10
+                                />
+                                <div className="absolute right-2 top-0 h-full flex flex-col justify-center">
+                                    <button type="button" onClick={handleIncrement} className="text-gray-600 h-1/2 flex items-center justify-center px-1">
+                                        <i className="fa fa-angle-up text-xs"></i>
+                                    </button>
+                                    <button type="button" onClick={handleDecrement} className="text-gray-600 h-1/2 flex items-center justify-center px-1">
+                                        <i className="fa fa-angle-down text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
                             
-                            {/* Hàng 3: INPUT + BUTTONS (Desktop) HOẶC BUTTONS (Mobile) */}
                             <div className="flex flex-row gap-2 w-full">
                                 {/* Input cho Desktop */}
-                                <input 
-                                    type="number" 
-                                    value={quantity}
-                                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                    className="hidden md:block w-20 h-12 text-center border border-gray-300 rounded-full" // Chỉ hiện trên desktop
-                                    min="1"
-                                />
+                                <div className="relative hidden md:block w-20">
+                                    <input 
+                                        type="text" 
+                                        inputMode="numeric" 
+                                        value={quantityInput}
+                                        onChange={handleQuantityChange}
+                                        onBlur={handleQuantityBlur}
+                                        onKeyDown={handleQuantityKeyDown}
+                                        className="w-full h-12 text-center border border-gray-300 rounded-full pr-6" // Thêm pr-6
+                                    />
+                                    <div className="absolute right-1 top-0 h-full flex flex-col justify-center">
+                                        <button type="button" onClick={handleIncrement} className="text-gray-600 h-1/2 flex items-center justify-center px-1">
+                                            <i className="fa fa-angle-up text-xs"></i>
+                                        </button>
+                                        <button type="button" onClick={handleDecrement} className="text-gray-600 h-1/2 flex items-center justify-center px-1">
+                                            <i className="fa fa-angle-down text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
                                 
                                 {/* Các nút bấm (chung) */}
-                                <button 
-                                    className="flex-1 h-12 bg-[#703fc8] text-white font-semibold rounded-full uppercase 
-                                               hover:bg-opacity-90 transition-all text-sm cursor-pointer"
-                                >
+                                <button className="flex-1 h-12 bg-[#703fc8] text-white font-semibold rounded-full uppercase hover:bg-opacity-90 transition-all text-sm cursor-pointer">
                                     Thêm vào giỏ hàng
                                 </button>
                                 <button className="w-12 h-12 border border-gray-300 rounded-full flex items-center justify-center flex-shrink-0 hover:border-gray-500 transition-all cursor-pointer" aria-label="Thêm vào yêu thích">
