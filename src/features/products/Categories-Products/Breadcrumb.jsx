@@ -16,9 +16,10 @@ const Breadcrumb = ({ breadcrumbItems = [] }) => {
                                         <Link to={item.link} className="hover:underline hover:text-purple-600 transition-colors duration-200">
                                             {item.name}
                                         </Link>
+
                                     ) : (
                                         // Nếu LÀ cuối -> chỉ hiển thị text, không có link
-                                        <span className= "hover:text-purple-600" >{item.name}</span>
+                                        <span className="hover:text-purple-600" >{item.name}</span>
                                     )}
                                 </li>
 
