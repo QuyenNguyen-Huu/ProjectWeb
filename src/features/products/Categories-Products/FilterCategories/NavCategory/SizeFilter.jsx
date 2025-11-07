@@ -33,10 +33,13 @@ export default function SizeFilter({ products = [] }) {
                 {products.map((size, index) => {
                     const isActive = selectedSizes.includes(size);
                     return (
-                        <li key={index}>
+                        <li key={index} className="w-full h-full size-container" >
                             <a
+                                style={{
+                                    fontSize: "clamp(0.9rem, 5cqw, 1rem)",
+                                }}
                                 onClick={() => toggleSelect(size)}
-                                className={`select-none focus:outline-none block border font-bold text-center border-white shadow-[0_0_0_1px_#000] m-[5px] p-[5px] cursor-pointer transition-all
+                                className={`select-none focus:outline-none block border font-bold text-center border-white shadow-[0_0_0_1px_#000] m-[5px] p-[5px] cursor-pointer transition-all 
                                 ${isActive
                                         ? "bg-[#673ab7] !text-white"
                                         : "hover:bg-[#673ab7] hover:!text-white"}
