@@ -2,7 +2,8 @@ import React from 'react';
 
 import { Link } from 'react-router-dom';
 
-import { useCart } from '../../../../context/cartContext'; 
+import { useCart } from '@/context/cartContext'; 
+
 
 const CartIcon = () => {
     // 3. Lấy dữ liệu từ Context
