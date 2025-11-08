@@ -83,7 +83,7 @@ const SidebarCategories = () => {
                         <h2 className="mt-0 text-[18px] mb-4 font-semibold inline-block pr-2.5 text-[#363636] decoration-0 ">Giá</h2>
                         <span className="icon-dropdown cate-box flex mt-1 cursor-pointer select-none focus:outline-none "
                             onClick={() => toggleSection("price")}>
-                            <i className="fa fa-angle-up "></i>
+                            <i className={`fa ${openSections.price ? "fa-angle-up" : "fa-angle-down"} transition-transform duration-300`}></i>
                         </span>
                     </div>
                     {openSections.price && (
@@ -96,7 +96,7 @@ const SidebarCategories = () => {
                         <h2 className="mt-0 text-[18px] mb-4 font-semibold inline-block pr-2.5 text-[#363636] decoration-0 ">Kích cỡ</h2>
                         <span className="icon-dropdown cate-box flex mt-1 cursor-pointer select-none focus:outline-none "
                             onClick={() => toggleSection("size")}>
-                            <i className="fa fa-angle-up "></i>
+                            <i className={`fa ${openSections.size ? "fa-angle-up" : "fa-angle-down"} transition-transform duration-300`}></i>
                         </span>
                     </div>
                     {openSections.size && (
@@ -109,7 +109,7 @@ const SidebarCategories = () => {
                         <h2 className="mt-0 text-[18px] mb-4 font-semibold inline-block pr-2.5 text-[#363636] decoration-0 ">Thương hiệu</h2>
                         <span className="icon-dropdown cate-box flex mt-1 cursor-pointer select-none focus:outline-none "
                             onClick={() => toggleSection("banner")}>
-                            <i className="fa fa-angle-up "></i>
+                            <i className={`fa ${openSections.banner ? "fa-angle-up" : "fa-angle-down"} transition-transform duration-300`}></i>
                         </span>
                     </div>
                     {openSections.banner && (

@@ -53,10 +53,17 @@ export default function PriceFilter() {
     // --- Range slider ---
     const handleRangeChange = (e, type) => {
         const value = Number(e.target.value);
+
         if (type === "min") {
-            setMinPrice(value > maxPrice ? maxPrice : value);
+            // Chỉ cập nhật nếu nhỏ hơn maxPrice
+            if (value <= maxPrice) {
+                setMinPrice(value);
+            }
         } else {
-            setMaxPrice(value < minPrice ? minPrice : value);
+            // Chỉ cập nhật nếu lớn hơn minPrice
+            if (value >= minPrice) {
+                setMaxPrice(value);
+            }
         }
     };
 
@@ -66,6 +73,7 @@ export default function PriceFilter() {
         if (minPrice > maxPrice) return;
         const params = `?price=${minPrice}:${maxPrice}`;
         navigate(params, { replace: false });
+        window.location.href = params;
     };
 
     // --- Input focus behavior ---
