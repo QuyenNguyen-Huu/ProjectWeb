@@ -26,25 +26,23 @@ export const CartProvider = ({ children }) => {
     // --- SỬA ĐỔI TẠI ĐÂY ---
     // Hàm thêm sản phẩm (đã có thể thêm nhiều)
     // 'itemToAdd' là một object hoàn chỉnh: { id, name, price, size, quantity, image }
-    const addToCart = (itemToAdd) => {
-        console.log("Kiểm tra", itemToAdd);
+    const addToCart = (product) => {
         setCartItems(prevItems => {
             const existingItem = prevItems.find(item =>
-                item.id === itemToAdd.id && item.size === itemToAdd.size
+                item.id === product.id && item.size === product.size
             );
 
             if (existingItem) {
-                // Yêu cầu 4: Nếu đã có, cộng số lượng
                 return prevItems.map(item =>
-                    (item.id === itemToAdd.id && item.size === itemToAdd.size)
-                        ? { ...item, quantity: item.quantity + itemToAdd.quantity } // Cộng dồn
+                    (item.id === product.id && item.size === product.size)
+                        ? { ...item, quantity: item.quantity + 1 }
                         : item
                 );
             }
-            // Yêu cầu 3: Nếu chưa có, thêm dòng mới
-            return [...prevItems, itemToAdd]; // itemToAdd đã chứa quantity
+            return [...prevItems, { ...product, quantity: 1 }];
         });
     };
+
     // --- KẾT THÚC SỬA ĐỔI ---
 
 
