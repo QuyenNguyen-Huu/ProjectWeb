@@ -12,6 +12,7 @@ const ProductCard = ({
   isNew = false,
   isGift = false,
 }) => {
+  console.log("Kiểm tra product card", title, href, images, price, oldPrice, salePercent, isNew, isGift);
   // State điều khiển hiển thị popup
   const [quickViewProduct, setQuickViewProduct] = useState(null);
 

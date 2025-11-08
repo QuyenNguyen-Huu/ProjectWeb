@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
+// --- THÊM IMPORT ---
+import { useNavigate } from 'react-router-dom';
+import { useCart } from '../../context/cartContext'; // Import hook giỏ hàng
 
 const SIZES_MOCK = ["36", "37.5", "38", "38 2/3", "39 1/3", "40", "40 2/3", "41 1/3"];
 
 const ProductQuickView = ({ product, onClose }) => {
+    console.log("Kiểm tra product", product);
     const [selectedSize, setSelectedSize] = useState(null);
     const [quantity, setQuantity] = useState(1);
+
+    // --- THÊM HOOKS ---
+    const { addToCart } = useCart();
+    const navigate = useNavigate(); // Hook để điều hướng
 
     const handleOverlayClick = (e) => {
         if (e.target === e.currentTarget) onClose();
@@ -17,6 +25,29 @@ const ProductQuickView = ({ product, onClose }) => {
         }
     };
 
+    // --- THÊM HÀM MỚI ---
+    const handleAddToCart = () => {
+        // 1. Tạo đối tượng 'item' để thêm vào giỏ
+        // (Phải khớp với cấu trúc mà CartPage đang dùng)
+        const itemToAdd = {
+            id: product.id || "SP001",
+            name: product.title,
+            price: product.price,
+            image: product.images?.[0], // Lấy ảnh đầu tiên
+            size: selectedSize,
+            quantity: quantity,      // Lấy số lượng từ state
+            href: product.href       // Thêm href để dùng trong CartPage
+        };
+        
+        // 2. Gọi hàm từ context
+        addToCart(itemToAdd);
+
+        // 3. (Yêu cầu 1) Chuyển hướng đến trang giỏ hàng
+        // Thay '/cart' bằng route giỏ hàng của bạn
+        navigate('/cart'); 
+    };
+    // --- KẾT THÚC HÀM MỚI ---
+
     if (!product) return null;
 
     return (
@@ -28,7 +59,7 @@ const ProductQuickView = ({ product, onClose }) => {
                 className="bg-white rounded-lg max-w-4xl w-full relative shadow-2xl transform transition-all duration-300 scale-100 animate-zoomIn"
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Close button */}
+                {/* Close button (giữ nguyên) */}
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition"
@@ -41,7 +72,7 @@ const ProductQuickView = ({ product, onClose }) => {
 
                 {/* Layout 2 cột */}
                 <div className="grid grid-cols-1 md:grid-cols-2">
-                    {/* Cột ảnh */}
+                    {/* Cột ảnh (giữ nguyên) */}
                     <div className="p-8">
                         <img
                             src={product.images?.[0]}
@@ -68,7 +99,7 @@ const ProductQuickView = ({ product, onClose }) => {
 
                         <p className="text-3xl font-bold text-[#f47435]">{product.price}</p>
 
-                        {/* Size */}
+                        {/* Size (giữ nguyên) */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Kích cỡ:</label>
                             <div className="flex flex-wrap gap-2">
@@ -98,11 +129,17 @@ const ProductQuickView = ({ product, onClose }) => {
                                 className="w-20 border border-gray-300 rounded p-2 text-center focus:outline-none focus:ring-2 focus:ring-purple-300"
                                 onKeyPress={(e) => !/[0-9]/.test(e.key) && e.preventDefault()}
                             />
+                            
+                            {/* --- SỬA NÚT BẤM --- */}
                             <button
-                                className="flex-1 bg-purple-600 text-white font-bold py-3 px-6 rounded-md hover:bg-purple-700 transition-colors"
+                                onClick={handleAddToCart}
+                                disabled={!selectedSize} // (Yêu cầu 2) Disable khi chưa chọn size
+                                className="flex-1 bg-purple-600 text-white font-bold py-3 px-6 rounded-md hover:bg-purple-700 transition-colors 
+                                           disabled:bg-gray-400 disabled:cursor-not-allowed" // Thêm style cho 'disabled'
                             >
                                 THÊM VÀO GIỎ HÀNG
                             </button>
+                            {/* --- KẾT THÚC SỬA NÚT BẤM --- */}
                         </div>
                     </div>
                 </div>

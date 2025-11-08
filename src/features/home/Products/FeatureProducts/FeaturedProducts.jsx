@@ -5,6 +5,7 @@ import ProductCard from '@/components/common/ProductCard';
 import { mockNewProducts } from '../data/mockProducts';
 
 const FeaturedProducts = () => {
+  console.log("Kiểm tra mockNewProducts", mockNewProducts);
   return (
     <section className="py-12">
       <div className="collection_container">
@@ -17,6 +18,11 @@ const FeaturedProducts = () => {
                 title={product.title}
                 images={product.images}
                 showAddToCart={false}
+                price={product.price}
+                oldPrice={product.oldPrice}
+                salePercent={product.salePercent}
+                isNew={product.isNew}
+                isGift={product.isGift}
               />
             </div>
           ))}

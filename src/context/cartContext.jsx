@@ -3,9 +3,8 @@ import React, { createContext, useContext, useState, useMemo, useEffect } from '
 // 1. Tạo Context
 const CartContext = createContext();
 
-// 2. Tạo Provider (Component "bọc" toàn bộ ứng dụng)
+// 2. Tạo Provider
 export const CartProvider = ({ children }) => {
-    // State để lưu trữ các sản phẩm trong giỏ
     const [cartItems, setCartItems] = useState(() => {
         try {
             const localData = localStorage.getItem('cart');
@@ -24,33 +23,39 @@ export const CartProvider = ({ children }) => {
         }
     }, [cartItems]);
 
-    // Hàm thêm sản phẩm vào giỏ
-    const addToCart = (product) => {
+    // --- SỬA ĐỔI TẠI ĐÂY ---
+    // Hàm thêm sản phẩm (đã có thể thêm nhiều)
+    // 'itemToAdd' là một object hoàn chỉnh: { id, name, price, size, quantity, image }
+    const addToCart = (itemToAdd) => {
+        console.log("Kiểm tra", itemToAdd);
         setCartItems(prevItems => {
             const existingItem = prevItems.find(item =>
-                item.id === product.id && item.size === product.size
+                item.id === itemToAdd.id && item.size === itemToAdd.size
             );
 
             if (existingItem) {
+                // Yêu cầu 4: Nếu đã có, cộng số lượng
                 return prevItems.map(item =>
-                    (item.id === product.id && item.size === product.size)
-                        ? { ...item, quantity: item.quantity + 1 }
+                    (item.id === itemToAdd.id && item.size === itemToAdd.size)
+                        ? { ...item, quantity: item.quantity + itemToAdd.quantity } // Cộng dồn
                         : item
                 );
             }
-            return [...prevItems, { ...product, quantity: 1 }];
+            // Yêu cầu 3: Nếu chưa có, thêm dòng mới
+            return [...prevItems, itemToAdd]; // itemToAdd đã chứa quantity
         });
     };
+    // --- KẾT THÚC SỬA ĐỔI ---
 
-    // Hàm cập nhật số lượng
+
+    // Hàm cập nhật số lượng (giữ nguyên)
     const updateQuantity = (productId, size, newQuantity) => {
         if (newQuantity <= 0) {
-            // Nếu số lượng <= 0, xóa khỏi giỏ
             removeFromCart(productId, size);
         } else {
             setCartItems(prevItems =>
                 prevItems.map(item =>
-                    (item.id === productId && item.size === size) // Kiểm tra cả 'size'
+                    (item.id === productId && item.size === size)
                         ? { ...item, quantity: newQuantity }
                         : item
                 )
@@ -58,41 +63,38 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // Hàm xóa sản phẩm
+    // Hàm xóa sản phẩm (giữ nguyên)
     const removeFromCart = (productId, size) => {
         setCartItems(prevItems => prevItems.filter(item => !(item.id === productId && item.size === size)));
     };
 
-    // Hàm tính tổng tiền
+    // Hàm tính tổng tiền (giữ nguyên)
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
-            // Chuyển đổi giá (ví dụ: "1,200,000 VNĐ") thành số
-            // (Lưu ý: Hãy đảm bảo 'item.price' có định dạng đúng)
             const priceString = item.price || '0';
             const priceNumber = parseFloat(priceString.replace(/[^0-9]/g, ''));
             return total + (priceNumber * item.quantity);
         }, 0);
     };
 
-    // Hàm Format tiền (ví dụ: 1200000 -> "1,200,000 VNĐ")
+    // Hàm Format tiền (giữ nguyên)
     const formatCurrency = (amount) => {
-        // Sử dụng 'vi-VN' và 'VND'
         return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
             currency: 'VND',
-            minimumFractionDigits: 0 // Không hiển thị số lẻ (ví dụ: ,00)
-        }).format(amount).replace(/\./g, ','); // Thay dấu chấm bằng dấu phẩy
+            minimumFractionDigits: 0
+        }).format(amount).replace(/\./g, ',');
     };
 
     // Tối ưu hóa Context value
     const value = useMemo(() => ({
         cartItems,
-        addToCart,
+        addToCart, // Hàm addToCart mới đã được đưa vào
         updateQuantity,
         removeFromCart,
         calculateTotal,
         formatCurrency
-    }), [cartItems]);
+    }), [cartItems]); // cartItems là dependency đúng
 
     return (
         <CartContext.Provider value={value}>
@@ -101,7 +103,7 @@ export const CartProvider = ({ children }) => {
     );
 };
 
-// 3. Tạo Hook tùy chỉnh (để các component khác dễ sử dụng)
+// 3. Tạo Hook tùy chỉnh (giữ nguyên)
 export const useCart = () => {
     const context = useContext(CartContext);
     if (context === undefined) {
