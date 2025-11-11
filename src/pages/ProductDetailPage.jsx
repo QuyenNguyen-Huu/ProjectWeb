@@ -9,7 +9,8 @@ import RelatedProducts from '@/components/common/RelatedProducts';
 
 import { useCart } from '../context/cartContext';
 // Import "database"
-import { ALL_PRODUCTS, CLOTHING_SIZE_CHART_HTML, SHOES_SIZE_CHART_HTML } from '@/data/products';
+import apiClient from '@/api/apiClient'; //
+import {  CLOTHING_SIZE_CHART_HTML, SHOES_SIZE_CHART_HTML } from '@/data/products';
 // Import components cho "Sản phẩm liên quan"
 import ProductCarousel from '@/components/common/ProductCarousel';
 import ProductCard from '@/components/common/ProductCard';
@@ -65,7 +66,9 @@ export default function ProductDetailPage() {
 
     // Tìm sản phẩm dựa trên slug, bỏ ".html"
     const cleanSlug = productSlug.replace(/.html$/, '');
-    const product = ALL_PRODUCTS.find(p => p.slug === cleanSlug);
+    const [product, setProduct] = useState(null); // 'product' bây giờ là state
+    const [isLoading, setIsLoading] = useState(true); // Thêm state loading
+    const [relatedProducts, setRelatedProducts] = useState([]);
 
     // --- State ---
     const [productName, setProductName] = useState('');
@@ -85,55 +88,73 @@ export default function ProductDetailPage() {
     const mobileScrollContainerRef = useRef(null);
     
     const { addToCart } = useCart();
-    // Logic lọc sản phẩm liên quan
-    const relatedProducts = useMemo(() => {
-        if (!product) return [];
-
-        return ALL_PRODUCTS
-            // R2: Lọc sản phẩm cùng category
-            .filter(p => p.category === product.category)
-            // R1: Lọc bỏ chính sản phẩm đang xem
-            .filter(p => p.slug !== product.slug)
-            .map(p => ({
-                id: p.id,
-                title: p.name,
-                href: `/${p.slug}.html`,
-                images: p.images_card,
-                price: p.price,
-                oldPrice: p.oldPrice,
-                salePercent: p.salePercent,
-            }));
-    }, [product]);
 
     // --- Effects ---
     useEffect(() => {
-        // --- THAY ĐỔI 4: Cập nhật Effect để dùng `product` ---
-        if (product) {
-            window.scrollTo(0, 0);
-            
-            // Lấy tên từ product
-            const cleanedName = product.name; 
-            setProductName(cleanedName);
-            
-            // Rút gọn tên cho breadcrumb
-            let breadcrumbName = cleanedName;
-            if (breadcrumbName.length > 40) breadcrumbName = breadcrumbName.substring(0, 40) + '...';
-            
-            setBreadcrumbItems([
-                { name: 'Trang chủ', link: '/' },
-                { name: 'Men', link: '/do-nam' }, // Cần logic tốt hơn nếu có category
-                { name: breadcrumbName, link: `/${product.slug}.html` }
-            ]);
-            
-            // Set size mặc định
-            if (product.sizes && product.sizes.length > 0) {
-                setSelectedSize(product.sizes[0]);
+        const fetchProductData = async () => {
+            if (!productSlug) return;
+
+            setIsLoading(true);
+            setProduct(null); // Xóa sản phẩm cũ
+            const cleanSlug = productSlug.replace(/.html$/, '');
+
+            try {
+                // 1. Gọi API bằng apiClient
+                const productData = await apiClient.getProductBySlug(cleanSlug);
+                setProduct(productData); // Cập nhật state sản phẩm
+
+                // 2. Fetch sản phẩm liên quan (Sau khi đã có category của sản phẩm chính)
+                if (productData && productData.category) {
+                    const relatedData = await apiClient.getProducts({ 
+                        category: productData.category
+                    });
+                    // Lọc sản phẩm hiện tại ra khỏi danh sách liên quan
+                    setRelatedProducts(
+                        relatedData
+                            .filter(p => p.slug !== cleanSlug)
+                            .map(p => ({ // Chuyển đổi data cho ProductCard
+                                id: p.id,
+                                title: p.name,
+                                href: `/${p.slug}.html`,
+                                images: p.images_card,
+                                price: p.price,
+                                oldPrice: p.oldPrice,
+                                salePercent: p.salePercent,
+                            }))
+                    );
+                }
+
+                // --- Logic cũ (giữ nguyên, nhưng dùng productData) ---
+                window.scrollTo(0, 0);
+                
+                const cleanedName = productData.name; 
+                let breadcrumbName = cleanedName;
+                if (breadcrumbName.length > 40) breadcrumbName = breadcrumbName.substring(0, 40) + '...';
+                
+                setBreadcrumbItems([
+                    { name: 'Trang chủ', link: '/' },
+                    // Cần logic tốt hơn để tìm đúng category cha
+                    { name: productData.category, link: `/${productData.category}` }, // Tạm dùng category
+                    { name: breadcrumbName, link: `/${productData.slug}.html` }
+                ]);
+                
+                if (productData.sizes && productData.sizes.length > 0) {
+                    setSelectedSize(productData.sizes[0]);
+                }
+                setSelectedImageIndex(0);
+                setThumbnailStartIndex(0);
+                
+            } catch (error) {
+                console.error("Lỗi fetch chi tiết sản phẩm:", error);
+                setProduct(null); // Đánh dấu là không tìm thấy
+            } finally {
+                setIsLoading(false);
             }
-            
-            setSelectedImageIndex(0);
-            setThumbnailStartIndex(0);
-        }
-    }, [product]); // Chạy lại khi 'product' thay đổi (tức là khi slug thay đổi)
+        };
+
+        fetchProductData();
+        
+    }, [productSlug]); // Chạy lại khi 'product' thay đổi (tức là khi slug thay đổi)
 
     useEffect(() => {
         // ... (Effect cuộn gallery mobile... không đổi) ...
@@ -162,6 +183,24 @@ export default function ProductDetailPage() {
             });
         }
     }, [selectedImageIndex, isDesktop]); // Chạy mỗi khi ảnh được chọn thay đổi
+
+    if (isLoading) {
+        return (
+            <div className={`${isDesktop ? 'mt-[80px]' : 'mt-[54px]'} container mx-auto px-4 py-8 text-center`}>
+                <h1 className="text-2xl font-bold">Đang tải sản phẩm...</h1>
+            </div>
+        );
+    }
+
+    if (!product) {
+        return (
+            <div className={`${isDesktop ? 'mt-[80px]' : 'mt-[54px]'} container mx-auto px-4 py-8 text-center`}>
+                <h1 className="text-2xl font-bold">404 - Không tìm thấy sản phẩm</h1>
+                <p className="mt-4">Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+                <a href="/" className="view-more-btn mt-6">Quay về trang chủ</a>
+            </div>
+        );
+    }
 
     // --- Handlers ---
     // (Desktop thumbs handlers... cần 'product')

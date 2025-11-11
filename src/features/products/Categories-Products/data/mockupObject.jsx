@@ -4,7 +4,7 @@ export const categoriesMockup = [
         name: 'Men',
         link: '/do-nam',
         children: [
-            { id: 'men-road-running', name: 'Road Running Shoes', link: '/giay-chay-bo-nam-' },
+            { id: 'men-road-running', name: 'Road Running Shoes', link: '/giay-chay-bo-nam' },
             { id: 'men-trail-running', name: 'Trail Running Shoes', link: '/giay-chay-dia-hinh-nam' },
             { id: 'men-top', name: 'Top', link: '/ao-chay-bo-nam' },
             { id: 'men-top', name: 'Bottom', link: '/ao-chay-bo-nam' },
