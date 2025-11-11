@@ -36,7 +36,6 @@ export default function useProducts() {
 
     useEffect(() => {
         setIsLoading(true);
-
         const queryParams = new URLSearchParams(location.search);
         const sortType = queryParams.get("show") || "";
         const pageFromUrl = parseInt(queryParams.get("page") || "1", 10);
@@ -44,7 +43,28 @@ export default function useProducts() {
         setSelectedOption(sortType);
         setCurrentPage(pageFromUrl);
 
+        const priceParam = queryParams.get("price"); // ví dụ: "100000:200000"
+        const brandParam = queryParams.get("brand"); // (nếu có thêm filter theo brand)
+
         let sortedProducts = [...flatProducts];
+
+        if (priceParam) {
+            const [min, max] = priceParam.split(":").map(Number);
+            if (!isNaN(min) && !isNaN(max)) {
+                sortedProducts = sortedProducts.filter((p) => {
+                    const price = p.numericPrice || 0;
+                    return price >= min && price <= max;
+                });
+            }
+        }    
+          // 🧩 (Tuỳ chọn) lọc theo thương hiệu
+        if (brandParam) {
+            sortedProducts = sortedProducts.filter(
+                (p) => p.brand?.toLowerCase() === brandParam.toLowerCase()
+            );
+        }
+
+
 
         // 🧩 Sắp xếp theo loại
         switch (sortType) {
