@@ -2,8 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import ProductCarousel from '@/components/common/ProductCarousel';
 import ProductCard from '@/components/common/ProductCard';
-// 1. BỎ import mockProducts
-// import { mockNewProducts } from '../data/mockProducts'; 
 
 // 2. IMPORT apiClient
 import apiClient from '@/api/apiClient'; //

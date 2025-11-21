@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import apiClient from "@/api/apiClient"; //
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 60;
 
 // --- 1. NÂNG CẤP BỘ ĐIỀU HƯỚNG ---
 // Nó sẽ trả về cả category CHÍNH và category PHỤ (để lọc client)
@@ -161,7 +161,6 @@ export default function useProducts() {
                         });
                     });
                 }
-                // --- Kết thúc lọc client ---
 
                 setAllProducts(transformedProducts);
 
