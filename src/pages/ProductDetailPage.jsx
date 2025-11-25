@@ -6,14 +6,16 @@ import Breadcrumb from "@/features/products/Categories-Products/Breadcrumb";
 // --- PopUp ---
 import mockCollections from "@/features/home/Collections/data/mockCollections"; 
 import RelatedProducts from '@/components/common/RelatedProducts'; 
+import { formatCurrency } from '@/utils/formatCurrency';
 
 import { useCart } from '../context/cartContext';
 // Import "database"
 import apiClient from '@/api/apiClient'; //
-import {  CLOTHING_SIZE_CHART_HTML, SHOES_SIZE_CHART_HTML } from '@/data/products';
+import {  getClothingSizeChartHTML, getShoesSizeChartHTML } from '@/data/products';
 // Import components cho "Sản phẩm liên quan"
 import ProductCarousel from '@/components/common/ProductCarousel';
 import ProductCard from '@/components/common/ProductCard';
+import { useLanguage } from "@/context/LanguageContext";
 
 // --- Cấu hình Zoom ---
 const LENS_SIZE = 180;
@@ -23,38 +25,46 @@ const ZOOM_SCALE = ZOOM_BOX_SIZE / LENS_SIZE;
 
 // --- Hàm helper để tạo HTML ---
 // Hàm này tạo bảng HTML cho tab "Thành phần"
-const generateCompositionHtml = (product) => {
+const generateCompositionHtml = (product, t) => {
     // Helper để biến mảng thành <li>
     const createList = (items) => {
-        if (!items || items.length === 0) return '<li>Đang cập nhật...</li>';
+        if (!items || items.length === 0) return `<li>${t('common.loading')}...</li>`;
         return items.map(item => `<li>- ${item}</li>`).join('');
     };
+    
+    // Lấy highlights theo ngôn ngữ
+    const highlights = t(product, 'highlights') || product.highlights || [];
+    
     return `
       <table class="w-full text-left border-collapse border border-gray-300">
         <tbody>
-          <tr class="border-b border-gray-300"><td class="p-2 border-r border-gray-300 font-semibold w-1/3">Tên sản phẩm</td><td class="p-2">${product.name}</td></tr>
-          <tr class="border-b border-gray-300"><td class="p-2 border-r border-gray-300 font-semibold">Thương hiệu</td><td class="p-2">${product.brand}</td></tr>
-          <tr class="border-b border-gray-300"><td class="p-2 border-r border-gray-300 font-semibold">Kích cỡ</td><td class="p-2"><ul class="list-none">${createList(product.sizes)}</ul></td></tr>
-          <tr><td class="p-2 border-r border-gray-300 font-semibold">Đặc điểm</td><td class="p-2"><ul class="list-none">${createList(product.highlights)}</ul></td></tr>
+          <tr class="border-b border-gray-300"><td class="p-2 border-r border-gray-300 font-semibold w-1/3">${t('product.card.viewDetail')}</td><td class="p-2">${t(product, 'name')}</td></tr>
+          <tr class="border-b border-gray-300"><td class="p-2 border-r border-gray-300 font-semibold">${t('product.detail.brand')}</td><td class="p-2">${product.brand}</td></tr>
+          <tr class="border-b border-gray-300"><td class="p-2 border-r border-gray-300 font-semibold">${t('product.filter.size')}</td><td class="p-2"><ul class="list-none">${createList(product.sizes)}</ul></td></tr>
+          <tr><td class="p-2 border-r border-gray-300 font-semibold">${t('product.detail.highlights')}</td><td class="p-2"><ul class="list-none">${createList(highlights)}</ul></td></tr>
         </tbody>
       </table>
     `;
 };
 
 // Hàm này tạo HTML cho tab "Mô tả chi tiết"
-const generateDescriptionHtml = (product) => {
+const generateDescriptionHtml = (product, t) => {
     let html = '';
-    product.description_content.forEach(item => {
+    const descriptionContent = product.description_content || [];
+    
+    descriptionContent.forEach(item => {
         if (item.type === 'paragraph') {
-            html += `<h4 class="font-bold text-lg my-3">${item.title}</h4><p class="mb-4">${item.content}</p>`;
+            const title = t(item, 'title') || item.title || '';
+            const content = t(item, 'content') || item.content || '';
+            html += `<h4 class="font-bold text-lg my-3">${title}</h4><p class="mb-4">${content}</p>`;
         } else if (item.type === 'image') {
-            html += `<img src="${item.src}" alt="${item.alt || product.name}" class="my-4 w-full h-auto rounded" />`;
+            html += `<img src="${item.src}" alt="${item.alt || t(product, 'name')}" class="my-4 w-full h-auto rounded" />`;
         }
     });
     if (product.category === 'clothing') {
-        html += CLOTHING_SIZE_CHART_HTML;
+        html += getClothingSizeChartHTML(t);
     } else if (product.category === 'shoes') {
-        html += SHOES_SIZE_CHART_HTML;
+        html += getShoesSizeChartHTML(t);
     }
     return html;
 };
@@ -63,6 +73,7 @@ const generateDescriptionHtml = (product) => {
 export default function ProductDetailPage() {
     const isDesktop = useIsDesktop();
     const { productSlug } = useParams();
+    const { t, language } = useLanguage();
 
     // Tìm sản phẩm dựa trên slug, bỏ ".html"
     const cleanSlug = productSlug.replace(/.html$/, '');
@@ -96,11 +107,22 @@ export default function ProductDetailPage() {
 
             setIsLoading(true);
             setProduct(null); // Xóa sản phẩm cũ
+            setRelatedProducts([]);
             const cleanSlug = productSlug.replace(/.html$/, '');
 
             try {
                 // 1. Gọi API bằng apiClient
-                const productData = await apiClient.getProductBySlug(cleanSlug);
+                const response = await apiClient.getProductBySlug(cleanSlug);
+                console.log("Dữ liệu sản phẩm nhận được từ API:", response);
+
+                // --- BÓC TÁCH DỮ LIỆU ---
+                const productData = response.mainProduct;       // Lấy sản phẩm chính
+                const relatedData = response.relatedProducts || []; // Lấy sản phẩm liên quan
+
+                // Kiểm tra an toàn
+                if (!productData || !productData.name) {
+                    throw new Error("Sản phẩm không tồn tại hoặc dữ liệu lỗi");
+                }
                 setProduct(productData); // Cập nhật state sản phẩm
 
                 // 2. Fetch sản phẩm liên quan (Sau khi đã có category của sản phẩm chính)
@@ -114,6 +136,7 @@ export default function ProductDetailPage() {
                             .filter(p => p.slug !== cleanSlug)
                             .map(p => ({ // Chuyển đổi data cho ProductCard
                                 id: p.id,
+                                product: p, // Thêm product object để dùng với t()
                                 title: p.name,
                                 href: `/${p.slug}.html`,
                                 images: p.images_card,
@@ -132,7 +155,7 @@ export default function ProductDetailPage() {
                 if (breadcrumbName.length > 40) breadcrumbName = breadcrumbName.substring(0, 40) + '...';
                 
                 setBreadcrumbItems([
-                    { name: 'Trang chủ', link: '/' },
+                    { name: 'Trang chủ', nameKey: 'common.home', link: '/' },
                     // Cần logic tốt hơn để tìm đúng category cha
                     { name: productData.category, link: `/${productData.category}` }, // Tạm dùng category
                     { name: breadcrumbName, link: `/${productData.slug}.html` }
@@ -143,6 +166,8 @@ export default function ProductDetailPage() {
                 }
                 setSelectedImageIndex(0);
                 setThumbnailStartIndex(0);
+                setQuantity(1);
+                setQuantityInput("1");
                 
             } catch (error) {
                 console.error("Lỗi fetch chi tiết sản phẩm:", error);
@@ -154,7 +179,7 @@ export default function ProductDetailPage() {
 
         fetchProductData();
         
-    }, [productSlug]); // Chạy lại khi 'product' thay đổi (tức là khi slug thay đổi)
+    }, [productSlug, t]); // Thêm t vào dependency để re-fetch khi language thay đổi
 
     useEffect(() => {
         // ... (Effect cuộn gallery mobile... không đổi) ...
@@ -184,10 +209,21 @@ export default function ProductDetailPage() {
         }
     }, [selectedImageIndex, isDesktop]); // Chạy mỗi khi ảnh được chọn thay đổi
 
+    // --- Tạo HTML động cho tab (phụ thuộc vào product và ngôn ngữ) ---
+    const descriptionHtml = useMemo(() => {
+        if (!product) return '';
+        return generateDescriptionHtml(product, t);
+    }, [product, t]);
+    
+    const compositionHtml = useMemo(() => {
+        if (!product) return '';
+        return generateCompositionHtml(product, t);
+    }, [product, t]);
+
     if (isLoading) {
         return (
             <div className={`${isDesktop ? 'mt-[80px]' : 'mt-[54px]'} container mx-auto px-4 py-8 text-center`}>
-                <h1 className="text-2xl font-bold">Đang tải sản phẩm...</h1>
+                <h1 className="text-2xl font-bold">{t('common.loading')}</h1>
             </div>
         );
     }
@@ -195,9 +231,9 @@ export default function ProductDetailPage() {
     if (!product) {
         return (
             <div className={`${isDesktop ? 'mt-[80px]' : 'mt-[54px]'} container mx-auto px-4 py-8 text-center`}>
-                <h1 className="text-2xl font-bold">404 - Không tìm thấy sản phẩm</h1>
-                <p className="mt-4">Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
-                <a href="/" className="view-more-btn mt-6">Quay về trang chủ</a>
+                <h1 className="text-2xl font-bold">404 - {t('product.detail.notFoundTitle')}</h1>
+                <p className="mt-4">{t('product.detail.notFoundMsg')}</p>
+                <a href="/" className="view-more-btn mt-6">{t('product.detail.backHome')}</a>
             </div>
         );
     }
@@ -217,7 +253,8 @@ export default function ProductDetailPage() {
 
         const productToAdd = {
             id: product.slug, // Dùng slug làm ID
-            name: product.name,
+            name: product.name, // Lưu tên tiếng Việt
+            name_en: product.name_en, // Lưu tên tiếng Anh
             price: product.price,
             image: product.images_detail[0], // Lấy ảnh đầu tiên
             size: selectedSize // Lấy size đã chọn từ state
@@ -227,7 +264,7 @@ export default function ProductDetailPage() {
         for (let i = 0; i < quantity; i++) {
             addToCart(productToAdd);
         }
-        console.log(`Đã thêm ${quantity} x ${product.name} (Size: ${selectedSize}) vào giỏ!`);
+        console.log(`Đã thêm ${quantity} x ${t(product, 'name')} (Size: ${selectedSize}) vào giỏ!`);
     };
 
     // (Zoom handlers... không đổi)
@@ -309,16 +346,12 @@ export default function ProductDetailPage() {
     if (!product) {
         return (
             <div className={`${isDesktop ? 'mt-[80px]' : 'mt-[54px]'} container mx-auto px-4 py-8 text-center`}>
-                <h1 className="text-2xl font-bold">Không tìm thấy sản phẩm</h1>
-                <p className="mt-4">Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
-                <a href="/" className="view-more-btn mt-6">Quay về trang chủ</a>
+                <h1 className="text-2xl font-bold">{t('product.detail.notFoundTitle')}</h1>
+                <p className="mt-4">{t('product.detail.notFoundMsg')}</p>
+                <a href="/" className="view-more-btn mt-6">{t('product.detail.backHome')}</a>
             </div>
         );
     }
-    
-    // --- Tạo HTML động cho tab ---
-    const descriptionHtml = generateDescriptionHtml(product);
-    const compositionHtml = generateCompositionHtml(product);
 
     // --- Render ---
     return (
@@ -361,7 +394,7 @@ export default function ProductDetailPage() {
                         </div>
                         {/* Khung Zoom */}
                         <div
-                            className={`absolute left-[101%] top-0 border bg-white ${isZooming && isDesktop ? 'block' : 'hidden'} pointer-events-none`}
+                            className={`absolute left-[101%] top-0 border bg-white z-50 ${isZooming && isDesktop ? 'block' : 'hidden'} pointer-events-none`}
                             style={{
                                 width: `${ZOOM_BOX_SIZE}px`, height: `${ZOOM_BOX_SIZE}px`,
                                 backgroundImage: `url(${product.images_detail[selectedImageIndex]})`,
@@ -405,15 +438,15 @@ export default function ProductDetailPage() {
 
                     {/* --- COLUMN 2: PRODUCT INFO (Dùng product. ...) --- */}
                     <div className="w-full mt-6 lg:mt-0 order-3">
-                        <h1 className="text-[26px] uppercase font-semibold mb-3 leading-tight">{product.name}</h1>
+                        <h1 className="text-[26px] uppercase font-semibold mb-3 leading-tight">{t(product, 'name')}</h1>
                         <div className="flex items-center text-sm text-gray-600 mb-4">
-                            <span>Thương hiệu: <span className="font-semibold text-gray-800">{product.brand}</span></span>
+                            <span>{t('product.detail.brand')}: <span className="font-semibold text-gray-800">{product.brand}</span></span>
                             <span className="mx-2 text-gray-300">|</span>
-                            <span>Mã SP: <span className="font-semibold text-gray-800">{product.sku}</span></span>
+                            <span>{t('product.detail.sku')}: <span className="font-semibold text-gray-800">{product.sku}</span></span>
                         </div>
-                        <div className="text-3xl font-bold text-gray-900 mb-6">{product.price}</div>
+                        <div className="text-3xl font-bold text-gray-900 mb-6">{formatCurrency(product.price, language)}</div>
                         <div className="mb-6">
-                            <label className="block text-md font-semibold mb-2">Chọn size:</label>
+                            <label className="block text-md font-semibold mb-2">{t('product.detail.selectSize')}</label>
                             <div className="flex gap-2">
                                 {product.sizes.map(size => (
                                     <button key={size} onClick={() => setSelectedSize(size)} className={`w-12 h-12 border rounded transition-colors hover:border-orange-500 focus:border-orange-500 focus:outline-none ${selectedSize === size ? 'border-orange-500 border-2' : 'border-gray-300'}`}>
@@ -425,7 +458,7 @@ export default function ProductDetailPage() {
 
                         {/* Quantity & Actions (Không đổi) */}
                         <div className="flex flex-col gap-4">
-                            <label className="font-semibold">Số lượng:</label>
+                            <label className="font-semibold">{t('product.detail.quantity')}</label>
                             <div className="relative w-full md:hidden">
                                 <input type="text" inputMode="numeric" value={quantityInput} onChange={handleQuantityChange} onBlur={handleQuantityBlur} onKeyDown={handleQuantityKeyDown} className="w-full h-12 text-center border border-gray-300 rounded-full pr-10" />
                                 <div className="absolute right-2 top-0 h-full flex flex-col justify-center">
@@ -442,9 +475,9 @@ export default function ProductDetailPage() {
                                     </div>
                                 </div>
                                 <button onClick={handleAddToCart} className="flex-1 h-12 bg-[#703fc8] text-white font-semibold rounded-full uppercase hover:bg-opacity-90 transition-all text-sm cursor-pointer">
-                                    Thêm vào giỏ hàng
+                                    {t('product.detail.addToCartBtn')}
                                 </button>
-                                <button className="w-12 h-12 border border-gray-300 rounded-full flex items-center justify-center flex-shrink-0 hover:border-gray-500 transition-all cursor-pointer" aria-label="Thêm vào yêu thích">
+                                <button className="w-12 h-12 border border-gray-300 rounded-full flex items-center justify-center flex-shrink-0 hover:border-gray-500 transition-all cursor-pointer" aria-label={t('product.detail.addToWishlist')}>
                                     <i className="far fa-heart"></i>
                                 </button>
                             </div>
@@ -452,11 +485,11 @@ export default function ProductDetailPage() {
                         
                         <hr className="my-6 border-t border-gray-300 md:hidden" />
 
-                        {/* Đặc điểm nổi bật (Dùng product.highlights) */}
+                        {/* Đặc điểm nổi bật */}
                         <div className="mt-6">
-                            <h3 className="font-bold text-red-500 mb-3 text-lg">Đặc điểm nổi bật</h3>
+                            <h3 className="font-bold text-red-500 mb-3 text-lg">{t('product.detail.highlights')}</h3>
                             <ul className="list-none space-y-2 text-gray-700">
-                                {product.highlights.map((item, index) => (
+                                {(t(product, 'highlights') || product.highlights || []).map((item, index) => (
                                     <li key={index}>- {item}</li>
                                 ))}
                             </ul>
@@ -475,14 +508,14 @@ export default function ProductDetailPage() {
                                     className={`py-3 px-6 text-sm font-semibold transition-all border
                                         ${activeTab === 'description' ? 'bg-[#673AB7] text-white border-[#673AB7]' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}
                                 >
-                                    Mô tả chi tiết
+                                    {t('product.detail.descriptionTab')}
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('composition')}
                                     className={`py-3 px-6 text-sm font-semibold transition-all border
                                         ${activeTab === 'composition' ? 'bg-[#673AB7] text-white border-[#673AB7]' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}
                                 >
-                                    Thành phần
+                                    {t('product.detail.compositionTab')}
                                 </button>
                             </nav>
                             
@@ -504,7 +537,7 @@ export default function ProductDetailPage() {
                                     className={`flex justify-between items-center w-full py-4 px-2
                                         ${activeTab === 'description' ? 'text-[#673AB7]' : 'text-gray-800'}`}
                                 >
-                                    <span className="font-semibold">Mô tả chi tiết</span>
+                                    <span className="font-semibold">{t('product.detail.descriptionTab')}</span>
                                     {activeTab !== 'description' && <i className="fa fa-angle-down text-gray-600"></i>}
                                 </button>
                                 <button
@@ -512,7 +545,7 @@ export default function ProductDetailPage() {
                                     className={`flex justify-between items-center w-full py-4 px-2 border-b border-gray-300
                                         ${activeTab === 'composition' ? 'text-[#673AB7]' : 'text-gray-800'}`}
                                 >
-                                    <span className="font-semibold">Thành phần</span>
+                                    <span className="font-semibold">{t('product.detail.compositionTab')}</span>
                                     {activeTab !== 'composition' && <i className="fa fa-angle-down text-gray-600"></i>}
                                 </button>
                             </div>
@@ -532,11 +565,12 @@ export default function ProductDetailPage() {
             {relatedProducts.length > 0 && (
                 <section className="py-16">
                     <div className="collection_container">
-                        <h2 className="section-title">Sản phẩm liên quan</h2>
+                        <h2 className="section-title">{t('product.detail.relatedProducts')}</h2>
                         <ProductCarousel>
                             {relatedProducts.map((relatedProduct) => (
                                 <div key={relatedProduct.id} className="product-carousel-item">
                                     <ProductCard
+                                        product={relatedProduct.product}
                                         href={relatedProduct.href}
                                         title={relatedProduct.title}
                                         images={relatedProduct.images}

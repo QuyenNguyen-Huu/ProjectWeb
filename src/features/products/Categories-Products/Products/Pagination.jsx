@@ -1,6 +1,9 @@
 import React, { useMemo, useState } from 'react';
+import { useLanguage } from "@/context/LanguageContext";
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+    const { t } = useLanguage();
+
     const [jumpToPageInput, setJumpToPageInput] = useState("");
     const pageNumbers = useMemo(() => {
         const pagesToShow = 4;
@@ -90,7 +93,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                     value={jumpToPageInput}
                     onChange={(e) => setJumpToPageInput(e.target.value)}
                     className="w-30 p-1  text-left"
-                    placeholder="Nhập trang"
+                    placeholder={t("product.pagination.inputPlaceholder")}
                     min="1"
                     max={totalPages}
                 />
@@ -98,7 +101,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                     type="submit"
                     className="ml-2 px-4 py-2 bg-gray-500 hover:bg-gray-200 text-sm text-white font-medium"
                 >
-                    Đi
+                   {t("product.pagination.goBtn")}
                 </button>
             </form>
         </div>

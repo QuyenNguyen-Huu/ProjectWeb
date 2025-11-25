@@ -1,34 +1,36 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Icon from '../common/Icon';
+import { useLanguage } from '@/context/LanguageContext';
 
 /**
  * Mobile bottom navigation panel
  */
 const MobileBottomPanel = () => {
   const location = useLocation();
+  const { t } = useLanguage();
 
   const navigationItems = [
     {
-      name: 'Home',
+      name: t('common.home'),
       path: '/',
       icon: 'home',
       current: location.pathname === '/'
     },
     {
-      name: 'Search',
+      name: t('common.search'),
       path: '/search',
       icon: 'search',
       current: location.pathname === '/search'
     },
     {
-      name: 'Cart',
+      name: t('common.cart'),
       path: '/cart',
       icon: 'cart',
       current: location.pathname === '/cart'
     },
     {
-      name: 'Profile',
+      name: t('common.profile'),
       path: '/profile',
       icon: 'user',
       current: location.pathname === '/profile'

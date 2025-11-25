@@ -1,9 +1,11 @@
 import React from 'react'
 import CartIcon from '../../../Item/CartIcon'
 import UserIcon from '../../../Item/UserIcon'
+import { useLanguage } from '@/context/LanguageContext';
 
 // Ngọc làm
 const NavIcon = () => {
+    const { t, switchLanguage, language } = useLanguage();
     return (
         <div className="sidebar-icon-nav">
             <ul className="nav-list">
@@ -13,7 +15,7 @@ const NavIcon = () => {
                             className=""
                             name="q"
                             type="search"
-                            placeholder="Tìm..."
+                            placeholder={t("common.searchPlaceholder")}
                             id="text-search"
                         />
                         <button type="submit" className="form-button">
@@ -28,22 +30,30 @@ const NavIcon = () => {
 
                 <li className="language">
                     <span className="flex">
-                        <a className="trans" href="/sis-b73890.html?locale=vi-vn">
+                        <button 
+                            className={`trans cursor-pointer ${language === 'vi' ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
+                            onClick={() => switchLanguage('vi')}
+                            title="Tiếng Việt"
+                        >
                             <img
                                 loading="lazy"
                                 src="https://web.nvnstatic.net/tp/T0194/img/vn.png?v=9"
                                 className="w-[30px] pr-[5px] border-r border-black"
                                 alt="VN"
                             />
-                        </a>
-                        <a className="trans pr-[10px]" href="/sis-b73890.html?locale=en-us">
+                        </button>
+                        <button 
+                            className={`trans pr-[10px] cursor-pointer ${language === 'en' ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
+                            onClick={() => switchLanguage('en')}
+                            title="English"
+                        >
                             <img
                                 loading="lazy"
                                 src="https://web.nvnstatic.net/tp/T0194/img/eng.png?v=9"
                                 className="w-[26px] pl-[5px]"
                                 alt="EN"
                             />
-                        </a>
+                        </button>
                     </span>
                 </li>
             </ul>

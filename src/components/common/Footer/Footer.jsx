@@ -1,22 +1,19 @@
 import React from "react";
 import { FacebookProvider, Page } from "react-facebook";
 import './Footer.css';
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Footer() {
+  const { t } = useLanguage();
+  
   return (
     <footer className="footer z-50">
       <div className="footer-container">
         {/* Giới thiệu */}
         <div className="footer-block">
-          <h3>Giới thiệu</h3>
+          <h3>{t("footer.introTitle")}</h3>
           <p className="intro-text">
-            IMSports chuyên giày dép, quần áo và phụ kiện chạy bộ/chạy địa hình
-            chính hãng đến từ các thương hiệu hàng đầu thế giới. Chúng tôi luôn
-            có sẵn những dòng sản phẩm mới nhất, tối ưu và hiệu suất cao dành
-            cho runners. Đội ngũ nhân viên trẻ trung, nhiệt huyết, là những chân
-            chạy đã được tích luỹ nhiều kinh nghiệm tập luyện và thi đấu sẽ mang
-            đến tinh thần phục vụ chuyên nghiệp và chuyên sâu nhất cho khách
-            hàng.
+            {t("footer.introText")}
           </p>
           <div className="social-icons">
   <a href="#" target="_blank" rel="noopener noreferrer">
@@ -44,7 +41,7 @@ export default function Footer() {
 
         {/* Địa chỉ Store */}
         <div className="footer-section">
-          <h3>Địa chỉ Store</h3>
+          <h3>{t("footer.storeAddress")}</h3>
           <p>
             <strong>HÀ NỘI</strong>
           </p>
@@ -66,7 +63,7 @@ export default function Footer() {
             </li>
           </ul>
           <p>
-            <strong>Đại lý ủy quyền tại Tp.HCM</strong>
+            <strong>{t("footer.hcm")}</strong>
           </p>
           <ul className="store-list">
             <li>
@@ -79,35 +76,35 @@ export default function Footer() {
 
         {/* Hướng dẫn */}
         <div className="footer-block">
-          <h3>Hướng dẫn</h3>
+          <h3>{t("footer.guide")}</h3>
           <ul>
             <li>
-              <a href="/">Sản phẩm</a>
+              <a href="/">{t("footer.policies.products")}</a>
             </li>
             <li>
-              <a href="/">Bản đồ</a>
+              <a href="/">{t("footer.policies.map")}</a>
             </li>
             <li>
-              <a href="/">Chính sách thanh toán</a>
+              <a href="/">{t("footer.policies.payment")}</a>
             </li>
             <li>
-              <a href="/">Chính sách vận chuyển</a>
+              <a href="/">{t("footer.policies.shipping")}</a>
             </li>
             <li>
-              <a href="/">Chính sách đổi trả hàng</a>
+              <a href="/">{t("footer.policies.return")}</a>
             </li>
             <li>
-              <a href="/">Chính sách bảo hành</a>
+              <a href="/">{t("footer.policies.warranty")}</a>
             </li>
             <li>
-              <a href="/">Chính sách bảo mật</a>
+              <a href="/">{t("footer.policies.privacy")}</a>
             </li>
           </ul>
         </div>
 
         {/* Theo dõi chúng tôi */}
         <div className="footer-block">
-          <h3>Theo dõi chúng tôi</h3>
+          <h3>{t("footer.followUs")}</h3>
           <FacebookProvider appId="228127589209779">
             <Page
               href="https://www.facebook.com/imsports.vn"
@@ -118,18 +115,18 @@ export default function Footer() {
           </FacebookProvider>
 
           <div className="email-input-wrapper">
-            <input type="email" placeholder="Nhập email của bạn" />
+            <input type="email" placeholder={t("footer.emailPlaceholder")} />
             <i className="far fa-paper-plane send-icon" aria-hidden="true"></i>
           </div>
 
           <p className="company-info">
-            Đăng ký để nhận chương trình ưu đãi!
+            {t("footer.registerPromo")}
             <br />
-            Website được sở hữu bởi Công ty TNHH Thể Thao Thung Lũng Mặt Trời,
+            {t("footer.copyright")}
             <br />
             GPĐK: 0109685009.
             <br />
-            Liên hệ CSKH:{" "}
+            {t("footer.contactCSKH")}
             <a href="mailto:sales@imsports.vn" className="email-link">
               sales@imsports.vn
             </a>

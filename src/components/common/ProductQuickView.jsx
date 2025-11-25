@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 // --- THÊM IMPORT ---
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/cartContext'; // Import hook giỏ hàng
+import { useLanguage } from '@/context/LanguageContext';
+import { formatCurrency } from '@/utils/formatCurrency';
 
 const SIZES_MOCK = ["36", "37.5", "38", "38 2/3", "39 1/3", "40", "40 2/3", "41 1/3"];
 
@@ -13,6 +15,7 @@ const ProductQuickView = ({ product, onClose }) => {
     // --- THÊM HOOKS ---
     const { addToCart } = useCart();
     const navigate = useNavigate(); // Hook để điều hướng
+    const { t } = useLanguage();
 
     const handleOverlayClick = (e) => {
         if (e.target === e.currentTarget) onClose();
@@ -63,7 +66,7 @@ const ProductQuickView = ({ product, onClose }) => {
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition"
-                    aria-label="Đóng"
+                    aria-label={t('common.close')}
                 >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -92,16 +95,16 @@ const ProductQuickView = ({ product, onClose }) => {
                         </a>
 
                         <p className="text-sm text-gray-500">
-                            <span>Mã SP: {product.id || "SP001"}</span>
+                            <span>{t('product.detail.sku')}: {product.id || "SP001"}</span>
                             <span className="mx-2">|</span>
-                            <span>Thương hiệu: HOKA</span>
+                            <span>{t('product.detail.brand')}: HOKA</span>
                         </p>
 
-                        <p className="text-3xl font-bold text-[#f47435]">{product.price}</p>
+                        <p className="text-3xl font-bold text-[#f47435]">{formatCurrency(product.price)}</p>
 
                         {/* Size (giữ nguyên) */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Kích cỡ:</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">{t('product.filter.size')}:</label>
                             <div className="flex flex-wrap gap-2">
                                 {SIZES_MOCK.map((size) => (
                                     <button
@@ -137,7 +140,7 @@ const ProductQuickView = ({ product, onClose }) => {
                                 className="flex-1 bg-purple-600 text-white font-bold py-3 px-6 rounded-md hover:bg-purple-700 transition-colors 
                                            disabled:bg-gray-400 disabled:cursor-not-allowed" // Thêm style cho 'disabled'
                             >
-                                THÊM VÀO GIỎ HÀNG
+                                {t('product.detail.addToCartBtn')}
                             </button>
                             {/* --- KẾT THÚC SỬA NÚT BẤM --- */}
                         </div>
