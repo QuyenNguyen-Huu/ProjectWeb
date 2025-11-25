@@ -1,6 +1,7 @@
 import React from "react";
 // BƯỚC 1: Import "Link" từ react-router-dom
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
 
 // Component con cho item có submenu
 const NavItem = ({ label, href, submenu }) => {
@@ -8,7 +9,11 @@ const NavItem = ({ label, href, submenu }) => {
     return (
       <li className="group relative cursor-pointer">
         {/* BƯỚC 2: Biến mục cha thành Link */}
-        <Link to={href} className="flex items-center">
+        <Link 
+          to={href} 
+          className="flex items-center no-underline"
+          style={{ color: 'inherit', textDecoration: 'none' }}
+        >
           {label}
           <i aria-hidden="true" className="ml-1 text-[9px] fa fa-angle-down"></i>
         </Link>
@@ -17,7 +22,13 @@ const NavItem = ({ label, href, submenu }) => {
           {submenu.map((item, idx) => (
             <li key={idx} className="px-4 py-2 cursor-pointer hover:bg-gray-100">
               {/* BƯỚC 3: Biến các mục con thành Link */}
-              <Link to={item.href} className="block w-full">{item.label}</Link>
+              <Link 
+                to={item.href} 
+                className="block w-full no-underline"
+                style={{ color: 'inherit', textDecoration: 'none' }}
+              >
+                {item.label}
+              </Link>
             </li>
           ))}
         </ul>
@@ -29,48 +40,55 @@ const NavItem = ({ label, href, submenu }) => {
   return (
     <li className="cursor-pointer">
       {/* BƯỚC 4: Biến mục đơn thành Link */}
-      <Link to={href}>{label}</Link>
+      <Link 
+        to={href} 
+        className="no-underline"
+        style={{ color: 'inherit', textDecoration: 'none' }}
+      >
+        {label}
+      </Link>
     </li>
   );
 };
-
+const NavBarDesktop = () => {
+  const { t, language } = useLanguage();
+  
 // Dữ liệu menu
 const navItems = [
-  { label: "Giới Thiệu", href: "/about" },
+  { label: t("header.menu.about"), href: "/about" },
   {
-    label: "Đồ nam",
-    href: "/do-nam", // <-- BƯỚC 5: Thêm href cho mục cha
+    label: t("header.menu.men"),
+    href: language === 'vi' ? '/do-nam' : '/men',
     submenu: [
-      { label: "Áo", href: "/men/shirt" },
-      { label: "Quần", href: "/men/pants" },
-      { label: "Giày Chạy Bộ", href: "/men/run-shoes" },
-      { label: "Giày Địa Hình", href: "/men/trail-shoes" },
+      { label: t("header.menu.menShirt"), href: language === 'vi' ? '/ao-chay-bo-nam' : '/men/shirt' },
+      { label: t("header.menu.menPants"), href: language === 'vi' ? '/quan-chay-bo-nam' : '/men/pants' },
+      { label: t("header.menu.menRunShoes"), href: language === 'vi' ? '/giay-chay-bo-nam' : '/men/run-shoes' },
+      { label: t("header.menu.menTrailShoes"), href: language === 'vi' ? '/giay-chay-dia-hinh-nam' : '/men/trail-shoes' },
     ],
   },
   {
-    label: "Đồ nữ",
-    href: "/do-nu", // <-- BƯỚC 5: Thêm href cho mục cha
+    label: t("header.menu.women"),
+    href: language === 'vi' ? '/do-nu' : '/women',
     submenu: [
-      { label: "Áo", href: "/women/shirt" },
-      { label: "Quần", href: "/women/pants" },
-      { label: "Giày Chạy Bộ", href: "/women/run-shoes" },
-      { label: "Giày Địa Hình", href: "/women/trail-shoes" },
+      { label: t("header.menu.womenShirt"), href: language === 'vi' ? '/ao-chay-bo-nu' : '/women/shirt' },
+      { label: t("header.menu.womenPants"), href: language === 'vi' ? '/quan-chay-bo-nu' : '/women/pants' },
+      { label: t("header.menu.womenRunShoes"), href: language === 'vi' ? '/giay-chay-bo-nu' : '/women/run-shoes' },
+      { label: t("header.menu.womenTrailShoes"), href: language === 'vi' ? '/giay-chay-dia-hinh-nu' : '/women/trail-shoes' },
     ],
   },
   {
-    label: "Đồng hồ",
-    href: "/dong-ho", // <-- BƯỚC 5: Thêm href cho mục cha
+    label: t("header.menu.watch"),
+    href: language === 'vi' ? '/dong-ho' : '/watch',
     submenu: [
-      { label: "Đồng Hồ Suunto", href: "/watch/suunto" },
-      { label: "Đồng Hồ Garmin", href: "/watch/garmin" },
-      { label: "Đồng Hồ Coros", href: "/watch/coros" },
+      { label: t("header.menu.suunto"), href: language === 'vi' ? '/dong-ho-suunto' : '/watch/suunto' },
+      { label: t("header.menu.garmin"), href: language === 'vi' ? '/dong-ho-garmin' : '/watch/garmin' },
+      { label: t("header.menu.coros"), href: language === 'vi' ? '/dong-ho-coros' : '/watch/coros' },
     ],
   },
-  { label: "SALE", href: "/sale" },
+  { label: t("header.menu.sale"), href: "/sale" },
 ];
 
-// NavBarDesktop
-const NavBarDesktop = () => {
+  // NavBarDesktop
   return (
     <nav className="bg-white font-[Montserrat,sans-serif]">
       <ul className="flex justify-start space-x-8 py-4 px-8 font-montserrat text-[15px] text-black-600 font-semibold">

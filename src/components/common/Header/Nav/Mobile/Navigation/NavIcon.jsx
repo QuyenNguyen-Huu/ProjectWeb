@@ -1,7 +1,10 @@
 import React from 'react'
 import CartIcon from '../../../Item/CartIcon'
+import { useLanguage } from '@/context/LanguageContext'
 
 const NavIcon = ({ toggleForm, showForm, closing }) => {
+    const { t, switchLanguage, language } = useLanguage();
+    
     return (
         <div className="sidebar-icon-nav">
             <ul className="nav-list">
@@ -16,7 +19,7 @@ const NavIcon = ({ toggleForm, showForm, closing }) => {
                                     className="bg-[#ebebeb] w-full px-2.5 py-1"
                                     name="q"
                                     type="search"
-                                    placeholder="Tìm..."
+                                    placeholder={t('common.searchPlaceholder')}
                                     id="text-search"
                                 />
                                 <button type="submit" className="form-button">
@@ -29,26 +32,34 @@ const NavIcon = ({ toggleForm, showForm, closing }) => {
                 <CartIcon />
                 <li className="language flex items-center">
                     <div className="flex items-center space-x-1">
-                        <a className="trans flex items-center" href="/sis-b73890.html?locale=vi-vn">
+                        <button 
+                            className={`trans flex items-center cursor-pointer ${language === 'vi' ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
+                            onClick={() => switchLanguage('vi')}
+                            title="Tiếng Việt"
+                        >
                             <img
                                 loading="lazy"
                                 src="https://web.nvnstatic.net/tp/T0194/img/vn.png?v=9"
                                 className="max-w-[40px] max-h-[24px] w-auto h-auto hover:opacity-80 transition"
                                 alt="VN"
                             />
-                        </a>
+                        </button>
 
                         {/* Thanh gạch giữa */}
                         <div className="h-[24px] w-[1px] bg-gray-400"></div>
 
-                        <a className="trans flex items-center" href="/sis-b73890.html?locale=en-us">
+                        <button 
+                            className={`trans flex items-center cursor-pointer ${language === 'en' ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
+                            onClick={() => switchLanguage('en')}
+                            title="English"
+                        >
                             <img
                                 loading="lazy"
                                 src="https://web.nvnstatic.net/tp/T0194/img/eng.png?v=9"
                                 className="max-w-[40px] max-h-[21px] w-auto h-auto hover:opacity-80 transition"
                                 alt="EN"
                             />
-                        </a>
+                        </button>
                     </div>
                 </li>
 

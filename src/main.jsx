@@ -5,17 +5,19 @@ import App from './App.jsx'
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { BrowserRouter } from 'react-router-dom';
 
-// 2. Import CartProvider (đảm bảo đúng đường dẫn)
+// Import Providers
 import { CartProvider } from './context/cartContext';
+import { LanguageProvider } from './context/LanguageContext';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  
     
     <BrowserRouter>
-      <CartProvider>
-        <App />
-      </CartProvider>
+      <LanguageProvider>
+        <CartProvider>
+          <App />
+        </CartProvider>
+      </LanguageProvider>
     </BrowserRouter>
 
-  </StrictMode>,
 )

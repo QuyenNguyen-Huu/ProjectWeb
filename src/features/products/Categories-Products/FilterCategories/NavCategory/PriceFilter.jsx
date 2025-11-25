@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function PriceFilter() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const MAX_PRICE = 2000000;
+  const MAX_PRICE = 20000000;
   const STEP = 10000;
 
   const [minPrice, setMinPrice] = useState(0);
@@ -185,7 +187,7 @@ export default function PriceFilter() {
         onClick={handleInputSearch}
         className="cursor-pointer w-full border border-black text-black uppercase text-sm font-semibold py-2 hover:bg-black hover:text-white transition-all"
       >
-        Search
+        {t("product.filter.searchBtn")}
       </button>
     </>
   );

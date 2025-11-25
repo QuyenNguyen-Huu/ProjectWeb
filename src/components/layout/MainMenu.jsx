@@ -1,17 +1,19 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useLanguage } from '@/context/LanguageContext';
 
 /**
  * Main navigation menu component
  */
 const MainMenu = ({ mobile = false, onItemClick }) => {
   const location = useLocation();
+  const { t } = useLanguage();
 
   const menuItems = [
-    { name: 'Home', path: '/', current: location.pathname === '/' },
-    { name: 'Products', path: '/products', current: location.pathname === '/products' },
-    { name: 'About', path: '/about', current: location.pathname === '/about' },
-    { name: 'Contact', path: '/contact', current: location.pathname === '/contact' },
+    { name: t('header.menu.home'), path: '/', current: location.pathname === '/' },
+    { name: t('header.menu.products'), path: '/products', current: location.pathname === '/products' },
+    { name: t('header.menu.about'), path: '/about', current: location.pathname === '/about' },
+    { name: t('header.menu.contact'), path: '/contact', current: location.pathname === '/contact' },
   ];
 
   const baseClasses = mobile

@@ -15,7 +15,12 @@ const findCategoryPath = (slug, categories) => {
         // Duyệt qua từng danh mục trong cấp độ hiện tại.
         for (const item of items) {
             // Xây dựng một đường dẫn mới bằng cách nối item hiện tại vào đường dẫn cũ.
-            const newPath = [...currentPath, { name: item.name, link: item.link }];
+            // Lưu cả nameKey để dịch sau
+            const newPath = [...currentPath, { 
+                name: item.name, 
+                nameKey: item.nameKey, 
+                link: item.link 
+            }];
 
             // KIỂM TRA: Đã tìm thấy đích đến chưa?
             if (item.link === slug) {
@@ -45,9 +50,10 @@ const findCategoryPath = (slug, categories) => {
     const result = search(categories, []);
 
     // Định dạng kết quả cuối cùng:
-    // Nếu có kết quả (result không phải null), hãy thêm 'Trang chủ' vào đầu.
-    // Nếu không, chỉ trả về một mảng chỉ có 'Trang chủ'.
-    return result ? [{ name: 'Trang chủ', link: '/' }, ...result] : [{ name: 'Trang chủ', link: '/' }];
+    // Nếu có kết quả (result không phải null), hãy thêm 'Home' với nameKey vào đầu.
+    // Nếu không, chỉ trả về một mảng chỉ có 'Home'.
+    const homeItem = { name: 'Trang chủ', nameKey: 'common.home', link: '/' };
+    return result ? [homeItem, ...result] : [homeItem];
 };
 
 export default findCategoryPath;
