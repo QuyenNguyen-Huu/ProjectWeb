@@ -2,7 +2,7 @@
 const mockCollections = [
     {
         id: 1,
-        title: "Đồ Nam",
+        titleKey: "categories.men",
         banner: "https://pos.nvncdn.com/be3294-43017/pc/20250701_TUKu18bH.jpg?v=1751362767",
         href: "/",
         products: [
@@ -94,7 +94,7 @@ const mockCollections = [
     },
     {
         id: 2,
-        title: "Đồ Nữ",
+        titleKey: "categories.women",
         banner: "https://pos.nvncdn.com/be3294-43017/pc/20250701_WL2Q91pl.jpg?v=1751362662",
         href: "/",
         products: [
@@ -186,7 +186,7 @@ const mockCollections = [
     },
     {
         id: 3,
-        title: "Phụ kiện",
+        titleKey: "categories.accessories",
         banner: "https://pos.nvncdn.com/be3294-43017/pc/20250701_Vsqqvpjp.jpg?v=1751363805",
         href: "/",
         products: [
@@ -278,7 +278,7 @@ const mockCollections = [
     },
     {
         id: 4,
-        title: "Triathlon",
+        titleKey: "categories.triathlon",
         banner: "https://pos.nvncdn.com/be3294-43017/pc/20250629_EJXmRWua.gif?v=1751207617",
         href: "/giay-nu-pc283069.html",
         products: [
@@ -370,7 +370,7 @@ const mockCollections = [
     },
     {
         id: 5,
-        title: "Đồng hồ - Tai nghe",
+        titleKey: "categories.watchHeadphone",
         banner: "https://pos.nvncdn.com/be3294-43017/pc/20250701_d7STdggP.jpg?v=1751364479",
         href: "/balo-tui-pc283070.html",
         products: [
@@ -462,7 +462,7 @@ const mockCollections = [
     },
     {
         id: 6,
-        title: "Dinh Dưỡng",
+        titleKey: "categories.nutrition",
         banner: "https://pos.nvncdn.com/be3294-43017/pc/20250629_ZDULUUSf.gif?v=1751196654",
         href: "/phu-kien-pc283071.html",
         products: [
@@ -554,7 +554,7 @@ const mockCollections = [
     },
     {
         id: 7,
-        title: "Chấn thương phục hồi",
+        titleKey: "categories.recovery",
         banner: "https://pos.nvncdn.com/be3294-43017/pc/20250629_9Dt5YPXk.gif?v=1751199541",
         href: "/ao-the-thao-nam-pc283072.html",
         products: [
@@ -4836,7 +4836,7 @@ const mockCollections = [
     },
     {
         id: 8,
-        title: "Lifestyle Sports",
+        titleKey: "categories.lifestyle",
         banner: "https://pos.nvncdn.com/be3294-43017/campaign/20250703_4V0p7w8j.jpeg?v=1751557901",
         href: "/ao-the-thao-nu-pc283073.html",
         products: [
@@ -6020,7 +6020,7 @@ const mockCollections = [
     },
     {
         id: 9,
-        title: "OUTLET Xem thêm ...",
+        titleKey: "categories.outlet",
         banner: "https://pos.nvncdn.com/be3294-43017/campaign/20250327_y2FpVTdy.jpeg?v=1743073809",
         href: "/giay-chay-trail-pc283074.html",
         products: [

@@ -1,8 +1,11 @@
 import React from "react";
 import { FaTag, FaGift, FaShoppingCart } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function LayoutMobileNav() {
+  const { t } = useLanguage();
+  
   return (
     <div
       className="fixed bottom-0 left-0 right-0 border-t border-gray-300 flex justify-around items-center py-4 h-[60px] z-[9999] md:hidden shadow-[0_-2px_8px_rgba(0,0,0,0.1)]"
@@ -10,15 +13,15 @@ export default function LayoutMobileNav() {
     >
       <Link to="/new-products" className="flex flex-col items-center text-gray-800 text-xs">
         <FaTag className="text-2xl" />
-        <span>Hàng mới</span>
+        <span>{t('header.mobileBottom.new')}</span>
       </Link>
       <Link to="/sale" className="flex flex-col items-center text-gray-800 text-xs">
         <FaGift className="text-2xl " />
-        <span>Khuyến mại</span>
+        <span>{t('header.mobileBottom.promo')}</span>
       </Link>
       <Link to="/cart" className="flex flex-col items-center text-gray-800 text-xs">
         <FaShoppingCart className="text-2xl " />
-        <span>Giỏ hàng</span>
+        <span>{t('header.mobileBottom.cart')}</span>
       </Link>
     </div>
   );

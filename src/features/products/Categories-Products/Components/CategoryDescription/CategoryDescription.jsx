@@ -1,9 +1,11 @@
 import React, { useState, useRef, useLayoutEffect } from 'react';
+import { useLanguage } from "@/context/LanguageContext";
 
 // Chiều cao tối đa trước khi ẩn
 const MAX_HEIGHT_PX = 400;
 
 const CategoryDescription = ({ description }) => {
+  const { t } = useLanguage();
   // State để theo dõi trạng thái mở rộng/thu gọn
   const [isExpanded, setIsExpanded] = useState(false);
   
@@ -52,16 +54,16 @@ const CategoryDescription = ({ description }) => {
 
       </div>
 
-      {/* Nút "Đọc thêm"
+      {/* Nút "Đọc thêm" / "Thu gọn"
         Chỉ hiển thị khi nội dung thực sự cần cắt bớt (needsTruncation)
       */}
-      {needsTruncation && !isExpanded && (
+      {needsTruncation && (
         <div className="flex justify-center mt-6">
           <button
             onClick={toggleExpand}
             className="px-6 py-2 border border-[#3b82f6] text-[#3b82f6] rounded-md hover:bg-[#3b82f6] hover:text-white transition-colors duration-300"
           >
-            Đọc thêm
+            {isExpanded ? t("common.showLess") : t("common.readMore")}
           </button>
         </div>
       )}

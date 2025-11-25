@@ -3,3 +3,16 @@
 .collections .collection_container {
     @apply px-4 mx-auto md:max-w-[750px] lg:max-w-[970px] xl:max-w-[1170px]
 }
+
+/* Hover effect cho title links */
+.collections_item .title h2 a {
+    cursor: default;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.collections_item .title h2 a:hover {
+    color: #9575CD !important;
+    cursor: pointer !important;
+    transform: scale(1.05);
+}

@@ -4,8 +4,11 @@ import { categoriesMockup } from '../data/mockupObject'
 import PriceFilter from './NavCategory/PriceFilter';
 import SizeFilter from './NavCategory/SizeFilter';
 import BrandFilter from './NavCategory/BrandFilter';
+import { useLanguage } from "@/context/LanguageContext";
 
 const SidebarCategories = () => {
+    const { t } = useLanguage();
+
     const brands = [
         "Norda", "HOKA", "2XU", "Compressport", "Salomon",
         "Patagonia", "Nike", "Adidas", "New Balance", "The North Face",
@@ -51,7 +54,7 @@ const SidebarCategories = () => {
             <aside className={`xl:w-1/4 dqdt-sidebar sidebar border-cus h-full ${openFilters ? 'open' : ''}`}>
                 <aside className='mb-5 pb-2'>
                     <div className="relative flex items-start justify-between text-2xl font-semibold text-center uppercase mt-4 mb-2.5">
-                        <h2 className="mt-0 text-[18px] mb-4 font-semibold inline-block pr-2.5 text-[#363636] decoration-0 ">Danh mục</h2>
+                        <h2 className="mt-0 text-[18px] mb-4 font-semibold inline-block pr-2.5 text-[#363636] decoration-0 ">{t("product.filter.category")}</h2>
                         <span className="icon-dropdown cate-box flex mt-1 cursor-pointer select-none focus:outline-none"
                             onClick={() => toggleSection("category")}>
                             <i className={`fa ${openSections.category ? "fa-angle-up" : "fa-angle-down"} transition-transform duration-300`}
@@ -80,7 +83,7 @@ const SidebarCategories = () => {
                 <hr className="my-4 border-gray-300 cursor-pointer select-none focus:outline-none" />
                 <aside className='mb-5 pb-2'>
                     <div className="relative flex items-start justify-between text-2xl font-semibold text-center uppercase mt-4 mb-2.5">
-                        <h2 className="mt-0 text-[18px] mb-4 font-semibold inline-block pr-2.5 text-[#363636] decoration-0 ">Giá</h2>
+                        <h2 className="mt-0 text-[18px] mb-4 font-semibold inline-block pr-2.5 text-[#363636] decoration-0 ">{t("product.filter.price")}</h2>
                         <span className="icon-dropdown cate-box flex mt-1 cursor-pointer select-none focus:outline-none "
                             onClick={() => toggleSection("price")}>
                             <i className={`fa ${openSections.price ? "fa-angle-up" : "fa-angle-down"} transition-transform duration-300`}></i>
@@ -93,7 +96,7 @@ const SidebarCategories = () => {
                 <hr className="my-4 border-gray-300 cursor-pointer select-none focus:outline-none" />
                 <aside className='mb-5 pb-2'>
                     <div className="relative flex items-start justify-between text-2xl font-semibold text-center uppercase mt-4 mb-2.5">
-                        <h2 className="mt-0 text-[18px] mb-4 font-semibold inline-block pr-2.5 text-[#363636] decoration-0 ">Kích cỡ</h2>
+                        <h2 className="mt-0 text-[18px] mb-4 font-semibold inline-block pr-2.5 text-[#363636] decoration-0 ">{t("product.filter.size")}</h2>
                         <span className="icon-dropdown cate-box flex mt-1 cursor-pointer select-none focus:outline-none "
                             onClick={() => toggleSection("size")}>
                             <i className={`fa ${openSections.size ? "fa-angle-up" : "fa-angle-down"} transition-transform duration-300`}></i>
@@ -106,7 +109,7 @@ const SidebarCategories = () => {
                 <hr className="my-4 border-gray-300 cursor-pointer select-none focus:outline-none" />
                 <aside className='mb-5 pb-2'>
                     <div className="relative flex items-start justify-between text-2xl font-semibold text-center uppercase mt-4 mb-2.5">
-                        <h2 className="mt-0 text-[18px] mb-4 font-semibold inline-block pr-2.5 text-[#363636] decoration-0 ">Thương hiệu</h2>
+                        <h2 className="mt-0 text-[18px] mb-4 font-semibold inline-block pr-2.5 text-[#363636] decoration-0 ">{t("product.filter.brand")}</h2>
                         <span className="icon-dropdown cate-box flex mt-1 cursor-pointer select-none focus:outline-none "
                             onClick={() => toggleSection("banner")}>
                             <i className={`fa ${openSections.banner ? "fa-angle-up" : "fa-angle-down"} transition-transform duration-300`}></i>

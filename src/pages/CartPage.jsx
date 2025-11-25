@@ -2,13 +2,38 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 // Import context
 import { useCart } from '../context/cartContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { formatCurrency } from '@/utils/formatCurrency';
 // Thêm icon ChevronUp và ChevronDown
 import { ChevronLeft, ChevronUp, ChevronDown } from 'lucide-react';
 
+// Helper: Parse tên sản phẩm từ tiếng Anh sang tiếng Việt (fallback)
+const getDisplayName = (item, language) => {
+    // Nếu có name_en, dùng nó
+    if (item.name_en) {
+        return language === 'en' ? item.name_en : item.name;
+    }
+    
+    // Nếu không có name_en, kiểm tra xem item.name có phải tiếng Anh không
+    // (tạm thời giải pháp: nếu name bắt đầu bằng chữ in hoa tiếng Anh thì coi như là EN)
+    const isEnglishName = /^[A-Z]/.test(item.name);
+    
+    if (isEnglishName && language === 'vi') {
+        // Trả về message cho user biết cần cập nhật
+        return item.name + ' (⚠️ Vui lòng xóa và thêm lại vào giỏ)';
+    }
+    
+    return item.name;
+};
+
 // --- COMPONENT CON: Dòng sản phẩm (Desktop) ---
 const CartItemRow = ({ item }) => {
-    const { updateQuantity, removeFromCart, formatCurrency } = useCart();
+    const { updateQuantity, removeFromCart } = useCart();
+    const { t, language } = useLanguage();
     const [localQuantity, setLocalQuantity] = useState(item.quantity);
+    
+    // Hiển thị tên theo ngôn ngữ hiện tại
+    const displayName = getDisplayName(item, language);
 
     const handleChange = (e) => {
         setLocalQuantity(e.target.value);
@@ -53,11 +78,11 @@ const CartItemRow = ({ item }) => {
                     to={`/${item.id}.html`}
                     className="hover:text-purple-600 cursor-pointer"
                 >
-                    {item.name}
+                    {displayName}
                     {item.size && ` - ${item.size}`}
                 </Link>
             </td>
-            <td className="p-4 text-center">{item.price}</td>
+            <td className="p-4 text-center">{formatCurrency(item.price, language)}</td>
             
             <td className="p-4 text-center">
                 <div className="relative w-24 h-11 mx-auto group">
@@ -73,14 +98,14 @@ const CartItemRow = ({ item }) => {
                         <button
                             onClick={handleIncrement}
                             className="flex items-center justify-center h-1/2 text-gray-600 hover:text-purple-600"
-                            aria-label="Tăng số lượng"
+                            aria-label={t('cart.increaseQuantity')}
                         >
                             <ChevronUp size={16} />
                         </button>
                         <button
                             onClick={handleDecrement}
                             className="flex items-center justify-center h-1/2 text-gray-600 hover:text-purple-600"
-                            aria-label="Giảm số lượng"
+                            aria-label={t('cart.decreaseQuantity')}
                         >
                             <ChevronDown size={16} />
                         </button>
@@ -89,12 +114,12 @@ const CartItemRow = ({ item }) => {
             </td>
 
             <td className="p-4 text-center font-semibold">
-                {formatCurrency(parseFloat(item.price.replace(/[^0-9]/g, '')) * item.quantity).replace(/[^0-9.,]/g, '')} VNĐ
+                {formatCurrency(item.price * item.quantity, language)}
             </td>
 
             <td className="p-4 text-center">
                 <button onClick={handleRemove} className="text-gray-500 hover:text-red-500 cursor-pointer">
-                    Xóa
+                    {t('cart.remove')}
                 </button>
             </td>
         </tr>
@@ -104,7 +129,11 @@ const CartItemRow = ({ item }) => {
 // --- COMPONENT CON : Dòng sản phẩm (Mobile) ---
 const CartItemRowMobile = ({ item }) => {
     const { updateQuantity, removeFromCart } = useCart();
+    const { t, language } = useLanguage();
     const [localQuantity, setLocalQuantity] = useState(item.quantity);
+    
+    // Hiển thị tên theo ngôn ngữ hiện tại
+    const displayName = getDisplayName(item, language);
 
     const handleChange = (e) => {
         const value = e.target.value;
@@ -153,12 +182,12 @@ const CartItemRowMobile = ({ item }) => {
                         to={`/${item.id}.html`}
                         className="hover:text-purple-600 cursor-pointer"
                     >
-                        {item.name}
+                        {displayName}
                         {item.size && ` - ${item.size}`}
                     </Link>
                 </p>
                 <p className="text-gray-600 mt-1">
-                    Giá : <span className="text-purple-600">{item.price}</span>
+                    {t('cart.price')} : <span className="text-purple-600">{formatCurrency(item.price, language)}</span>
                 </p>
             </div>
             <div className="flex flex-col items-center justify-between">
@@ -176,14 +205,14 @@ const CartItemRowMobile = ({ item }) => {
                         <button
                             onClick={handleIncrement}
                             className="h-1/2 text-gray-600 hover:bg-gray-100 w-full flex items-center justify-center"
-                            aria-label="Tăng số lượng"
+                            aria-label={t('cart.increaseQuantity')}
                         >
                             <ChevronUp size={14} />
                         </button>
                         <button
                             onClick={handleDecrement}
                             className="h-1/2 text-gray-600 hover:bg-gray-100 w-full flex items-center justify-center border-t border-gray-200"
-                            aria-label="Giảm số lượng"
+                            aria-label={t('cart.decreaseQuantity')}
                         >
                             <ChevronDown size={14} />
                         </button>
@@ -191,7 +220,7 @@ const CartItemRowMobile = ({ item }) => {
                 </div>
 
                 <button onClick={handleRemove} className="text-gray-500 hover:text-red-500 mt-2">
-                    Xóa
+                    {t('cart.remove')}
                 </button>
             </div>
         </div>
@@ -201,32 +230,33 @@ const CartItemRowMobile = ({ item }) => {
 
 // --- Component Cha (CartPage) ---
 const CartPage = () => {
-    const { cartItems, calculateTotal, formatCurrency } = useCart();
+    const { cartItems, calculateTotal } = useCart();
     const total = calculateTotal();
+    const { t, language } = useLanguage();
 
     return (
         <div className="container mx-auto px-4 py-8 text-gray-800 font-sans">
 
             <div className="text-sm mb-6">
                 <Link to="/" className="text-gray-800 hover:text-purple-600 hover:underline cursor-pointer">
-                    Trang chủ
+                    {t("common.home")}
                 </Link>
                 <span className="px-2 text-gray-500">/</span>
-                <span className="text-gray-500">Giỏ hàng</span>
+                <span className="text-gray-500">{t("common.cart")}</span>
             </div>
 
-            <h1 className="text-3xl font-semibold mb-2 uppercase text-gray-900">Giỏ hàng</h1>
-            <h2 className="md:hidden text-lg text-gray-600 mb-6">Giỏ hàng của bạn</h2>
+            <h1 className="text-3xl font-semibold mb-2 uppercase text-gray-900">{t("cart.title")}</h1>
+            <h2 className="md:hidden text-lg text-gray-600 mb-6">{t("cart.mobileTitle")}</h2>
 
             {cartItems.length === 0 ? (
                 <div className="pt-8 pb-16">
-                    <p className="text-lg mb-6 text-gray-800">Giỏ hàng rỗng</p>
+                    <p className="text-lg mb-6 text-gray-800">{t("cart.empty")}</p>
                     <Link
                         to="/"
                         className="text-gray-700 hover:text-purple-600 transition-colors flex items-center gap-2 w-fit cursor-pointer"
                     >
                         <ChevronLeft size={18} />
-                        Trang chủ
+                        {t('common.home')}
                     </Link>
                 </div>
             ) : (
@@ -235,12 +265,12 @@ const CartPage = () => {
                     <table className="hidden md:table w-full text-left border-collapse">
                         <thead className="border-b border-gray-300">
                             <tr>
-                                <th className="p-4 text-center">Hình ảnh</th>
-                                <th className="p-4 text-center">Tên sản phẩm</th>
-                                <th className="p-4 text-center">Đơn giá</th>
-                                <th className="p-4 text-center">Số lượng</th>
-                                <th className="p-4 text-center">Thành tiền</th>
-                                <th className="p-4 text-center">Xóa</th>
+                                <th className="p-4 text-center">{t('cart.image')}</th>
+                                <th className="p-4 text-center">{t('cart.productName')}</th>
+                                <th className="p-4 text-center">{t('cart.price')}</th>
+                                <th className="p-4 text-center">{t('cart.quantity')}</th>
+                                <th className="p-4 text-center">{t('cart.subtotal')}</th>
+                                <th className="p-4 text-center">{t('cart.remove')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -260,26 +290,26 @@ const CartPage = () => {
                     {/* === TỔNG TIỀN & NÚT (DESKTOP) === */}
                     <div className="hidden md:block mt-8">
                         <div className="flex justify-end items-center mb-4">
-                            <span className="text-xl">Tổng tiền:</span>
+                            <span className="text-xl">{t('cart.total')}:</span>
                             {/* ==========================================================
                             === THAY ĐỔI 1: ĐỔI TỔNG TIỀN (DESKTOP) SANG MÀU TÍM ===
                             ==========================================================
                             */}
-                            <span className="text-2xl font-bold text-purple-600 ml-4">{formatCurrency(total).replace(/[^0-9.,]/g, '')} VNĐ</span>
+                            <span className="text-2xl font-bold text-purple-600 ml-4">{formatCurrency(total, language)}</span>
                         </div>
                         <div className="flex justify-end gap-4">
                             <Link
                                 to="/"
-                                title="Tiếp tục mua hàng"
+                                title={t('cart.continueShopping')}
                                 className="px-8 py-3 bg-gray-200 text-black hover:bg-gray-300 transition-colors cursor-pointer rounded-full font-semibold uppercase"
                             >
-                                Tiếp tục mua hàng
+                                {t('cart.continueShopping')}
                             </Link>
                             <button
-                                title="Tiến hành đặt hàng"
+                                title={t('cart.checkout')}
                                 className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 transition-colors cursor-pointer rounded-full font-semibold uppercase"
                             >
-                                Đặt hàng
+                                {t('cart.checkout')}
                             </button>
                         </div>
                     </div>
@@ -287,23 +317,23 @@ const CartPage = () => {
                     {/* === TỔNG TIỀN & NÚT (MOBILE) ===  */}
                     <div className="md:hidden mt-8">
                         <div className="flex justify-between items-center mb-6">
-                            <span className="text-lg text-gray-900">Tổng tiền</span>
+                            <span className="text-lg text-gray-900">{t('cart.total')}</span>
                             {/* ==========================================================
                             === THAY ĐỔI 2: ĐỔI TỔNG TIỀN (MOBILE) SANG MÀU TÍM ===
                             ==========================================================
                             */}
-                            <span className="text-xl font-bold text-purple-600">{formatCurrency(total).replace(/[^0-9.,]/g, '')} VNĐ</span>
+                            <span className="text-xl font-bold text-purple-600">{formatCurrency(total, language)}</span>
                         </div>
                         <div className="space-y-4">
                             <button className="w-full px-6 py-4 bg-purple-600 text-white hover:bg-purple-700 transition-colors rounded-full font-semibold uppercase">
-                                Tiến hành thanh toán
+                                {t('cart.checkout')}
                             </button>
 
                             <Link
                                 to="/"
                                 className="block w-full text-center px-6 py-4 bg-gray-200 text-black hover:bg-gray-300 transition-colors rounded-full font-semibold uppercase"
                             >
-                                Tiếp tục mua hàng
+                                {t('cart.continueShopping')}
                             </Link>
                         </div>
                     </div>

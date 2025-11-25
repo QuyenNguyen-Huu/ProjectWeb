@@ -1,22 +1,25 @@
 import React from "react";
 import { FaTruck, FaUndo, FaHeadphones } from "react-icons/fa";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function PolicySection() {
+  const { t } = useLanguage();
+
   const policies = [
     {
       icon: <FaTruck className="text-3xl" />,
-      title: "MIỄN PHÍ VẬN CHUYỂN",
-      subtitle: "(BILL > 1M)",
+      title: t("home.policies.freeShip"),
+      subtitle: t("home.policies.billCondition"),
     },
     {
       icon: <FaUndo className="text-3xl" />,
-      title: "ĐỔI TRẢ TRONG VÒNG 7 NGÀY",
+      title: t("home.policies.return7Days"),
       subtitle: "",
     },
     {
       icon: <FaHeadphones className="text-3xl" />,
-      title: "SẢN PHẨM TRẢI NGHIỆM",
-      subtitle: "SẴN TẠI STORE",
+      title: t("home.policies.experience"),
+      subtitle: t("home.policies.storeAvailable"),
     },
   ];
 

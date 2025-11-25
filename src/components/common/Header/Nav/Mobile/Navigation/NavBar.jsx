@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 // BƯỚC 1: Import "Link" từ react-router-dom
 import { Link } from "react-router-dom";
+import { useLanguage } from '@/context/LanguageContext';
 
 // Icon tái sử dụng
 const Icon = ({ name, className = "" }) => (
@@ -9,25 +10,26 @@ const Icon = ({ name, className = "" }) => (
 
 const NavBar = ({ isOpen, setIsOpen }) => {
   const [activeMenu, setActiveMenu] = useState("main");
+  const { t, language } = useLanguage();
 
   // BƯỚC 2: Tạo dữ liệu menu con để dễ quản lý
   const menuData = {
     men: [
-      { label: "Áo", href: "/men/shirt" },
-      { label: "Quần", href: "/men/pants" },
-      { label: "Giày Chạy Bộ", href: "/men/run-shoes" },
-      { label: "Giày Địa Hình", href: "/men/trail-shoes" },
+      { labelKey: "header.menu.menShirt", href: language === 'vi' ? "/ao-chay-bo-nam" : "/men/shirt" },
+      { labelKey: "header.menu.menPants", href: language === 'vi' ? "/quan-chay-bo-nam" : "/men/pants" },
+      { labelKey: "header.menu.menRunShoes", href: language === 'vi' ? "/giay-chay-bo-nam" : "/men/run-shoes" },
+      { labelKey: "header.menu.menTrailShoes", href: language === 'vi' ? "/giay-trail-nam" : "/men/trail-shoes" },
     ],
     women: [
-      { label: "Áo", href: "/women/shirt" },
-      { label: "Quần", href: "/women/pants" },
-      { label: "Giày Chạy Bộ", href: "/women/run-shoes" },
-      { label: "Giày Địa Hình", href: "/women/trail-shoes" },
+      { labelKey: "header.menu.womenShirt", href: language === 'vi' ? "/ao-chay-bo-nu" : "/women/shirt" },
+      { labelKey: "header.menu.womenPants", href: language === 'vi' ? "/quan-chay-bo-nu" : "/women/pants" },
+      { labelKey: "header.menu.womenRunShoes", href: language === 'vi' ? "/giay-chay-bo-nu" : "/women/run-shoes" },
+      { labelKey: "header.menu.womenTrailShoes", href: language === 'vi' ? "/giay-trail-nu" : "/women/trail-shoes" },
     ],
     watch: [
-      { label: "Đồng Hồ Suunto", href: "/watch/suunto" },
-      { label: "Đồng Hồ Garmin", href: "/watch/garmin" },
-      { label: "Đồng Hồ Coros", href: "/watch/coros" },
+      { labelKey: "header.menu.suunto", href: language === 'vi' ? "/dong-ho/suunto" : "/watch/suunto" },
+      { labelKey: "header.menu.garmin", href: language === 'vi' ? "/dong-ho/garmin" : "/watch/garmin" },
+      { labelKey: "header.menu.coros", href: language === 'vi' ? "/dong-ho/coros" : "/watch/coros" },
     ],
   };
 
@@ -41,19 +43,23 @@ const NavBar = ({ isOpen, setIsOpen }) => {
   const panels = [
     {
       key: "main",
-      title: "Menu",
+      title: t('header.menu.menuTitle'),
       content: (
         <ul className="font-montserrat text-[15px] font-medium">
           <li className="px-4 py-3 border-b border-gray-300">
             {/* BƯỚC 4: Dùng Link và hàm onClick */}
-            <Link to="/about" onClick={handleLinkClick}>
-              Giới Thiệu
+            <Link 
+              to="/about" 
+              onClick={handleLinkClick}
+              className="block text-gray-800 hover:text-purple-600 transition-colors duration-200"
+            >
+              {t('header.menu.about')}
             </Link>
           </li>
           {[
-            { label: "Đồ Nam", key: "men", href: "/do-nam" },
-            { label: "Đồ Nữ", key: "women", href: "/do-nu" },
-            { label: "Đồng Hồ", key: "watch", href: "/dong-ho" },
+            { labelKey: "header.menu.men", key: "men", href: language === 'vi' ? "/do-nam" : "/men" },
+            { labelKey: "header.menu.women", key: "women", href: language === 'vi' ? "/do-nu" : "/women" },
+            { labelKey: "header.menu.watch", key: "watch", href: language === 'vi' ? "/dong-ho" : "/watch" },
           ].map((item) => (
             <li
               key={item.key}
@@ -63,14 +69,14 @@ const NavBar = ({ isOpen, setIsOpen }) => {
               <Link
                 to={item.href}
                 onClick={handleLinkClick}
-                className="flex-1 px-4 py-3"
+                className="flex-1 px-4 py-3 text-gray-800 hover:text-purple-600 transition-colors duration-200"
               >
-                {item.label}
+                {t(item.labelKey)}
               </Link>
               {/* Nút này chỉ để mở submenu */}
               <button
                 onClick={() => setActiveMenu(item.key)}
-                className="px-4 py-3 border-l border-gray-300 text-gray-600"
+                className="px-4 py-3 border-l border-gray-300 text-gray-600 hover:text-purple-600 transition-colors duration-200"
               >
                 <Icon name="fa-angle-right" className="ml-1 text-[9px]" />
               </button>
@@ -78,7 +84,11 @@ const NavBar = ({ isOpen, setIsOpen }) => {
           ))}
           <li className="px-4 py-3 border-b border-gray-300">
             {/* BƯỚC 4: Dùng Link và hàm onClick */}
-            <Link to="/sale" onClick={handleLinkClick}>
+            <Link 
+              to="/sale" 
+              onClick={handleLinkClick}
+              className="block text-gray-800 hover:text-purple-600 transition-colors duration-200"
+            >
               Sale
             </Link>
           </li>
@@ -88,21 +98,29 @@ const NavBar = ({ isOpen, setIsOpen }) => {
     // BƯỚC 6: Cập nhật các submenu (Đồ Nam)
     {
       key: "men",
-      title: "Đồ Nam",
+      title: t('header.menu.men'),
       back: "main",
       content: (
         <ul className="font-montserrat text-[15px] font-medium">
           {/* Thêm link "Xem tất cả" */}
           <li className="px-4 py-3 border-b border-gray-300 font-bold">
-            <Link to="/do-nam" onClick={handleLinkClick}>
-              Xem tất cả Đồ Nam
+            <Link 
+              to={language === 'vi' ? "/do-nam" : "/men"} 
+              onClick={handleLinkClick}
+              className="block text-gray-800 hover:text-purple-600 transition-colors duration-200"
+            >
+              {t('header.menu.viewAllMen')}
             </Link>
           </li>
           {/* Render các link con */}
           {menuData.men.map((item, i) => (
             <li key={i} className="px-4 py-3 border-b border-gray-300">
-              <Link to={item.href} onClick={handleLinkClick}>
-                {item.label}
+              <Link 
+                to={item.href} 
+                onClick={handleLinkClick}
+                className="block text-gray-800 hover:text-purple-600 transition-colors duration-200"
+              >
+                {t(item.labelKey)}
               </Link>
             </li>
           ))}
@@ -112,19 +130,27 @@ const NavBar = ({ isOpen, setIsOpen }) => {
     // BƯỚC 6: Cập nhật các submenu (Đồ Nữ)
     {
       key: "women",
-      title: "Đồ Nữ",
+      title: t('header.menu.women'),
       back: "main",
       content: (
         <ul className="font-montserrat text-[15px] font-medium">
           <li className="px-4 py-3 border-b border-gray-300 font-bold">
-            <Link to="/do-nu" onClick={handleLinkClick}>
-              Xem tất cả Đồ Nữ
+            <Link 
+              to={language === 'vi' ? "/do-nu" : "/women"} 
+              onClick={handleLinkClick}
+              className="block text-gray-800 hover:text-purple-600 transition-colors duration-200"
+            >
+              {t('header.menu.viewAllWomen')}
             </Link>
           </li>
           {menuData.women.map((item, i) => (
             <li key={i} className="px-4 py-3 border-b border-gray-300">
-              <Link to={item.href} onClick={handleLinkClick}>
-                {item.label}
+              <Link 
+                to={item.href} 
+                onClick={handleLinkClick}
+                className="block text-gray-800 hover:text-purple-600 transition-colors duration-200"
+              >
+                {t(item.labelKey)}
               </Link>
             </li>
           ))}
@@ -134,19 +160,27 @@ const NavBar = ({ isOpen, setIsOpen }) => {
     // BƯỚC 6: Cập nhật các submenu (Đồng Hồ)
     {
       key: "watch",
-      title: "Đồng Hồ",
+      title: t('header.menu.watch'),
       back: "main",
       content: (
         <ul className="font-montserrat text-[15px] font-medium">
           <li className="px-4 py-3 border-b border-gray-300 font-bold">
-            <Link to="/dong-ho" onClick={handleLinkClick}>
-              Xem tất cả Đồng Hồ
+            <Link 
+              to={language === 'vi' ? "/dong-ho" : "/watch"} 
+              onClick={handleLinkClick}
+              className="block text-gray-800 hover:text-purple-600 transition-colors duration-200"
+            >
+              {t('header.menu.viewAllWatch')}
             </Link>
           </li>
           {menuData.watch.map((item, i) => (
             <li key={i} className="px-4 py-3 border-b border-gray-300">
-              <Link to={item.href} onClick={handleLinkClick}>
-                {item.label}
+              <Link 
+                to={item.href} 
+                onClick={handleLinkClick}
+                className="block text-gray-800 hover:text-purple-600 transition-colors duration-200"
+              >
+                {t(item.labelKey)}
               </Link>
             </li>
           ))}

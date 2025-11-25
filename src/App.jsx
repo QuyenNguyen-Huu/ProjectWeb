@@ -26,9 +26,13 @@ function App() {
             Route này sẽ bắt bất kỳ URL nào có dạng /:productSlug.html */}
           <Route path="/:productSlug.html" element={<ProductDetailPage />} />
 
-          {/* Route cho Trang Danh mục (Category)
+          {/* Route cho Trang Danh mục (Category) - nested paths
+            Bắt các URL như /men/shirt, /women/run-shoes, etc. */}
+          <Route path="/:category/:subcategory" element={<ProductsPage />} />
+
+          {/* Route cho Trang Danh mục (Category) - single level
             Route này sẽ bắt tất cả các URL còn lại KHÔNG có .html
-            Ví dụ: /do-nam, /men/shirt, /sale... */}
+            Ví dụ: /do-nam, /sale... */}
           <Route path="/:slug" element={<ProductsPage />} />
         </Routes>
         

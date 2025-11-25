@@ -3,6 +3,43 @@ import React, { createContext, useContext, useState, useMemo, useEffect } from '
 // 1. Tạo Context
 const CartContext = createContext();
 
+// Helper: chuyển mọi dạng price về number an toàn
+function parsePrice(value) {
+    if (value == null) return 0; // null/undefined
+    if (typeof value === 'number' && !isNaN(value)) return value;
+    if (typeof value === 'string') {
+        // loại bỏ mọi ký tự không phải số, dấu chấm thập phân và dấu trừ
+        // giữ lại '.' và '-' để parseFloat có thể xử lý số âm và thập phân
+        const cleaned = value.replace(/[^\d.-]+/g, '');
+        const parsed = parseFloat(cleaned);
+        return isNaN(parsed) ? 0 : parsed;
+    }
+    if (typeof value === 'object') {
+        // nếu object chứa trường phổ biến, thử các trường đó
+        if ('amount' in value) return parsePrice(value.amount);
+        if ('price' in value) return parsePrice(value.price);
+        // fallback: chuyển object sang string rồi parse
+        try {
+            return parsePrice(String(value));
+        } catch {
+            return 0;
+        }
+    }
+    return 0;
+}
+
+// Hàm Format tiền (ví dụ: 1200000 -> "1.200.000 ₫")
+function formatCurrency(amount) {
+    const num = parsePrice(amount);
+    return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+        minimumFractionDigits: 0
+    })
+    .format(num)
+    .replace('₫', 'VNĐ');
+}
+
 // 2. Tạo Provider (Component "bọc" toàn bộ ứng dụng)
 export const CartProvider = ({ children }) => {
     // State để lưu trữ các sản phẩm trong giỏ
@@ -63,25 +100,13 @@ export const CartProvider = ({ children }) => {
         setCartItems(prevItems => prevItems.filter(item => !(item.id === productId && item.size === size)));
     };
 
-    // Hàm tính tổng tiền
+    // Hàm tính tổng tiền (an toàn)
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
-            // Chuyển đổi giá (ví dụ: "1,200,000 VNĐ") thành số
-            // (Lưu ý: Hãy đảm bảo 'item.price' có định dạng đúng)
-            const priceString = item.price || '0';
-            const priceNumber = parseFloat(priceString.replace(/[^0-9]/g, ''));
-            return total + (priceNumber * item.quantity);
+            const priceNumber = parsePrice(item.price ?? item.priceString ?? 0);
+            const qty = Number(item.quantity) || 0;
+            return total + (priceNumber * qty);
         }, 0);
-    };
-
-    // Hàm Format tiền (ví dụ: 1200000 -> "1,200,000 VNĐ")
-    const formatCurrency = (amount) => {
-        // Sử dụng 'vi-VN' và 'VND'
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-            minimumFractionDigits: 0 // Không hiển thị số lẻ (ví dụ: ,00)
-        }).format(amount).replace(/\./g, ','); // Thay dấu chấm bằng dấu phẩy
     };
 
     // Tối ưu hóa Context value

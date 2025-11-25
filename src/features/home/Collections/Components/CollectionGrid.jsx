@@ -11,6 +11,7 @@ const CollectionGrid = ({ products }) => {
                 {products.map((product, index) => (
                     <ProductCard
                         key={index}
+                        product={product.product || product}
                         title={product.title}
                         href={product.href}
                         images={product.images}

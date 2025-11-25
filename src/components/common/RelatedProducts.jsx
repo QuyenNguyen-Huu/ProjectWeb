@@ -21,13 +21,16 @@ const RelatedProducts = ({ products }) => {
             */}
             <div className="flex overflow-x-auto gap-3 lg:gap-5 snap-x snap-mandatory scroll-smooth scrollbar-none">
                 
-                {products.map((product, index) => (
+                {products.map((productItem, index) => (
                     <div 
                         key={index} 
                         className="flex-none snap-start w-[48%] lg:w-[24%]"
                     >
                         {/* ProductCard đã tự xử lý link (yêu cầu 6) */}
-                        <ProductCard {...product} />
+                        <ProductCard 
+                            {...productItem} 
+                            product={productItem.product || productItem}
+                        />
                     </div>
                 ))}
 

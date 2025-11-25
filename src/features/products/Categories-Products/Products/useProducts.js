@@ -1,9 +1,10 @@
 // src/features/products/Categories-Products/Products/useProducts.js (BẢN HOÀN CHỈNH)
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import apiClient from "@/api/apiClient"; //
+import apiClient from '@/api/apiClient';
+import { useLanguage } from '@/context/LanguageContext';
 
-const ITEMS_PER_PAGE = 60;
+const ITEMS_PER_PAGE = 12;
 
 // --- 1. NÂNG CẤP BỘ ĐIỀU HƯỚNG ---
 // Nó sẽ trả về cả category CHÍNH và category PHỤ (để lọc client)
@@ -11,22 +12,73 @@ function getCategoryInfoFromPath(path) {
     // Trang chủ hoặc không xác định
     if (path === '/') return { main: null, sub: null };
 
-    // Đồ nam
-    if (path.startsWith("/do-nam")) return { main: 'clothing', sub: 'nam' };
+    // === Xử lý nested routes (men/women) - English ===
+    // Men routes - English
+    if (path.startsWith("/men/shirt")) {
+        return { main: 'clothing', sub: 'nam' };
+    }
+    if (path.startsWith("/men/pants")) {
+        return { main: 'clothing', sub: 'nam' };
+    }
+    if (path.startsWith("/men/run-shoes")) {
+        return { main: 'shoes', sub: 'road-nam' };
+    }
+    if (path.startsWith("/men/trail-shoes")) {
+        return { main: 'shoes', sub: 'trail-nam' };
+    }
+    
+    // Women routes - English
+    if (path.startsWith("/women/shirt")) {
+        return { main: 'clothing', sub: 'nu' };
+    }
+    if (path.startsWith("/women/pants")) {
+        return { main: 'clothing', sub: 'nu' };
+    }
+    if (path.startsWith("/women/run-shoes")) {
+        return { main: 'shoes', sub: 'road-nu' };
+    }
+    if (path.startsWith("/women/trail-shoes")) {
+        return { main: 'shoes', sub: 'trail-nu' };
+    }
+
+    // Watch routes - English
+    if (path.startsWith("/watch/suunto")) {
+        return { main: 'watch', sub: 'suunto' };
+    }
+    if (path.startsWith("/watch/garmin")) {
+        return { main: 'watch', sub: 'garmin' };
+    }
+    if (path.startsWith("/watch/coros")) {
+        return { main: 'watch', sub: 'coros' };
+    }
+
+    // === Xử lý Vietnamese routes ===
+    // Áo/Quần
     if (path.startsWith("/ao-chay-bo-nam")) return { main: 'clothing', sub: 'nam' };
-
-    // Đồ nữ
-    if (path.startsWith("/do-nu")) return { main: 'clothing', sub: 'nu' };
+    if (path.startsWith("/quan-chay-bo-nam")) return { main: 'clothing', sub: 'nam' };
     if (path.startsWith("/ao-chay-bo-nu")) return { main: 'clothing', sub: 'nu' };
+    if (path.startsWith("/quan-chay-bo-nu")) return { main: 'clothing', sub: 'nu' };
+    
+    // Giày
+    if (path.startsWith("/giay-chay-bo-nam")) return { main: 'shoes', sub: 'road-nam' };
+    if (path.startsWith("/giay-chay-dia-hinh-nam")) return { main: 'shoes', sub: 'trail-nam' };
+    if (path.startsWith("/giay-chay-bo-nu")) return { main: 'shoes', sub: 'road-nu' };
+    if (path.startsWith("/giay-chay-dia-hinh-nu")) return { main: 'shoes', sub: 'trail-nu' };
 
-    // Giày Chạy Bộ (Road)
-    if (path.includes("giay-chay-bo")) return { main: 'shoes', sub: 'road' };
+    // Đồng hồ
+    if (path.startsWith("/dong-ho-suunto")) return { main: 'watch', sub: 'suunto' };
+    if (path.startsWith("/dong-ho-garmin")) return { main: 'watch', sub: 'garmin' };
+    if (path.startsWith("/dong-ho-coros")) return { main: 'watch', sub: 'coros' };
+    
+    // Parent categories - Show ALL products for men/women (clothing + shoes)
+    if (path === "/do-nam" || path === "/men") return { main: null, sub: 'all-nam' };
+    if (path === "/do-nu" || path === "/women") return { main: null, sub: 'all-nu' };
+    if (path.startsWith("/dong-ho") || path === "/watch") return { main: 'watch', sub: null };
 
-    // Giày Địa Hình (Trail)
-    if (path.includes("giay-chay-dia-hinh")) return { main: 'shoes', sub: 'trail' };
+    // Sale
+    if (path.startsWith("/sale")) return { main: null, sub: 'sale' };
 
-    // Mặc định (cho các link khác như /sale, /dong-ho...)
-    // Chúng ta sẽ phải tạo thêm data cho chúng sau
+    // Mặc định
     if (path.startsWith("/shoes")) return { main: 'shoes', sub: null };
     if (path.startsWith("/clothing")) return { main: 'clothing', sub: null };
     
@@ -40,24 +92,87 @@ function filterBySubCategory(products, subCategory) {
         return products; // Không cần lọc, trả về tất cả
     }
 
-    if (subCategory === 'nam') {
-        // Lọc các sản phẩm có chữ "Nam" trong tên
+    // ALL Men products (clothing + shoes)
+    if (subCategory === 'all-nam') {
         return products.filter(p => p.name.toLowerCase().includes('nam'));
     }
-    if (subCategory === 'nu') {
-        // Lọc các sản phẩm có chữ "Nữ" trong tên
+    
+    // ALL Women products (clothing + shoes)
+    if (subCategory === 'all-nu') {
         return products.filter(p => p.name.toLowerCase().includes('nữ'));
     }
+
+    // Clothing - Nam
+    if (subCategory === 'nam') {
+        return products.filter(p => p.name.toLowerCase().includes('nam'));
+    }
+    
+    // Clothing - Nữ
+    if (subCategory === 'nu') {
+        return products.filter(p => p.name.toLowerCase().includes('nữ'));
+    }
+    
+    // Shoes - Road (chạy bộ) - chung
     if (subCategory === 'road') {
-        // Lọc sản phẩm có chữ "Chạy Bộ" (không phải "Địa Hình")
         return products.filter(p => 
             p.name.toLowerCase().includes('chạy bộ') && 
             !p.name.toLowerCase().includes('địa hình')
         );
     }
+    
+    // Shoes - Road Nam
+    if (subCategory === 'road-nam') {
+        return products.filter(p => 
+            p.name.toLowerCase().includes('chạy bộ') && 
+            !p.name.toLowerCase().includes('địa hình') &&
+            p.name.toLowerCase().includes('nam')
+        );
+    }
+    
+    // Shoes - Road Nữ
+    if (subCategory === 'road-nu') {
+        return products.filter(p => 
+            p.name.toLowerCase().includes('chạy bộ') && 
+            !p.name.toLowerCase().includes('địa hình') &&
+            p.name.toLowerCase().includes('nữ')
+        );
+    }
+    
+    // Shoes - Trail (địa hình) - chung
     if (subCategory === 'trail') {
-        // Lọc sản phẩm có chữ "Địa Hình"
         return products.filter(p => p.name.toLowerCase().includes('địa hình'));
+    }
+    
+    // Shoes - Trail Nam
+    if (subCategory === 'trail-nam') {
+        return products.filter(p => 
+            p.name.toLowerCase().includes('địa hình') &&
+            p.name.toLowerCase().includes('nam')
+        );
+    }
+    
+    // Shoes - Trail Nữ
+    if (subCategory === 'trail-nu') {
+        return products.filter(p => 
+            p.name.toLowerCase().includes('địa hình') &&
+            p.name.toLowerCase().includes('nữ')
+        );
+    }
+
+    // Watch brands
+    if (subCategory === 'suunto') {
+        return products.filter(p => p.brand && p.brand.toLowerCase().includes('suunto'));
+    }
+    if (subCategory === 'garmin') {
+        return products.filter(p => p.brand && p.brand.toLowerCase().includes('garmin'));
+    }
+    if (subCategory === 'coros') {
+        return products.filter(p => p.brand && p.brand.toLowerCase().includes('coros'));
+    }
+
+    // Sale
+    if (subCategory === 'sale') {
+        return products.filter(p => p.oldPrice && p.oldPrice > p.price);
     }
 
     return products; // Mặc định trả về ds gốc
@@ -66,6 +181,7 @@ function filterBySubCategory(products, subCategory) {
 
 export default function useProducts() {
     const location = useLocation();
+    const { language } = useLanguage(); // Thêm language từ context
 
     // (State giữ nguyên)
     const [allProducts, setAllProducts] = useState([]);
@@ -95,23 +211,40 @@ export default function useProducts() {
             try {
                 // 2. GỌI API (chỉ gọi theo category CHÍNH và sort)
                 const apiParams = {
-                    category: category,
                     show: sortType,
                 };
+                
+                // Only add category if it exists (for all-nam/all-nu, we want ALL products)
+                if (category) {
+                    apiParams.category = category;
+                }
                 
                 // Lấy dữ liệu và chuẩn hóa
                 const res = await apiClient.getProducts(apiParams);
                 let productsFromApi = Array.isArray(res) ? res : (res?.items || []);
+
+                console.log("🚀 API Response:", {
+                    count: productsFromApi.length,
+                    firstProductRaw: productsFromApi[0],
+                    hasNameEn: !!productsFromApi[0]?.name_en
+                });
 
                 // Chuẩn hóa field ảnh để ProductCard nhận đúng prop `images`
                 let transformedProducts = productsFromApi.map(p => ({
                     ...p, // Giữ lại tất cả data gốc (id, name, slug, price, sizes...)
                     
                     // Thêm các trường mà ProductCard cần
+                    product: p, // Truyền product object để dùng với t()
                     title: p.name, // Thêm 'title' (lấy từ 'name')
                     href: `/${p.slug}.html`, // Thêm 'href' (lấy từ 'slug')
                     images: p.images_card || [], // Đảm bảo 'images' lấy từ 'images_card'
                 }));
+                
+                console.log("🔄 Transformed Products:", {
+                    count: transformedProducts.length,
+                    firstTransformed: transformedProducts[0],
+                    hasProductField: !!transformedProducts[0]?.product
+                });
 
                 // --- 3. LỌC Ở CLIENT (TOÀN BỘ) ---
                 // BƯỚC 3.1: Lọc theo Category PHỤ (Nam/Nữ, Road/Trail)
@@ -122,7 +255,7 @@ export default function useProducts() {
                     const [min, max] = priceParam.split(":").map(Number);
                     if (!isNaN(min) && !isNaN(max)) {
                         transformedProducts = transformedProducts.filter((p) => {
-                            const price = p.priceNumeric || 0;
+                            const price = p.price || 0;
                             return price >= min && price <= max;
                         });
                     }
@@ -186,7 +319,7 @@ export default function useProducts() {
 
         fetchData();
         
-    }, [location.search, location.pathname]);
+    }, [location.search, location.pathname, language]); // Thêm language vào dependency
 
     return {
         allProducts,

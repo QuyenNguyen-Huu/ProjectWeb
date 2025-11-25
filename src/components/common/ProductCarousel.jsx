@@ -73,6 +73,7 @@ const ProductCarousel = ({ children }) => {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = setTimeout(() => {
             const container = scrollContainerRef.current;
+            if (!container) return;
             const itemWidth = container.scrollWidth / allItems.length;
             const scrollEndPosition = (originalItems.length + CLONE_COUNT) * itemWidth;
             const scrollStartPosition = CLONE_COUNT * itemWidth;
