@@ -113,7 +113,6 @@ export default function ProductDetailPage() {
             try {
                 // 1. Gọi API bằng apiClient
                 const response = await apiClient.getProductBySlug(cleanSlug);
-                console.log("Dữ liệu sản phẩm nhận được từ API:", response);
 
                 // --- BÓC TÁCH DỮ LIỆU ---
                 const productData = response.mainProduct;       // Lấy sản phẩm chính
@@ -154,11 +153,28 @@ export default function ProductDetailPage() {
                 let breadcrumbName = cleanedName;
                 if (breadcrumbName.length > 40) breadcrumbName = breadcrumbName.substring(0, 40) + '...';
                 
+                // Dùng name_en cho tiếng Anh, name cho tiếng Việt
+                const productNameDisplay = language === 'en' && productData.name_en 
+                    ? productData.name_en 
+                    : cleanedName;
+                
+                let breadcrumbNameDisplay = productNameDisplay;
+                if (breadcrumbNameDisplay.length > 40) {
+                    breadcrumbNameDisplay = breadcrumbNameDisplay.substring(0, 40) + '...';
+                }
+                
+                // Dịch category name
+                const categoryName = productData.category || 'products';
+                const categoryDisplay = language === 'en' 
+                    ? (categoryName === 'clothing' ? 'Clothing' : 
+                       categoryName === 'shoes' ? 'Shoes' : 
+                       categoryName === 'accessories' ? 'Accessories' : categoryName)
+                    : categoryName;
+                
                 setBreadcrumbItems([
                     { name: 'Trang chủ', nameKey: 'common.home', link: '/' },
-                    // Cần logic tốt hơn để tìm đúng category cha
-                    { name: productData.category, link: `/${productData.category}` }, // Tạm dùng category
-                    { name: breadcrumbName, link: `/${productData.slug}.html` }
+                    { name: categoryDisplay, link: `/${categoryName}` },
+                    { name: breadcrumbNameDisplay, link: `/${productData.slug}.html` }
                 ]);
                 
                 if (productData.sizes && productData.sizes.length > 0) {
@@ -170,7 +186,6 @@ export default function ProductDetailPage() {
                 setQuantityInput("1");
                 
             } catch (error) {
-                console.error("Lỗi fetch chi tiết sản phẩm:", error);
                 setProduct(null); // Đánh dấu là không tìm thấy
             } finally {
                 setIsLoading(false);
@@ -264,7 +279,6 @@ export default function ProductDetailPage() {
         for (let i = 0; i < quantity; i++) {
             addToCart(productToAdd);
         }
-        console.log(`Đã thêm ${quantity} x ${t(product, 'name')} (Size: ${selectedSize}) vào giỏ!`);
     };
 
     // (Zoom handlers... không đổi)
