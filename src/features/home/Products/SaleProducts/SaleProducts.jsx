@@ -41,7 +41,7 @@ const SaleProducts = () => {
         setProducts(transformedProducts.slice(0, 8)); 
         
       } catch (error) {
-        console.error("Lỗi fetch sản phẩm sale:", error);
+        // Silent error handling
       } finally {
         setIsLoading(false);
       }
