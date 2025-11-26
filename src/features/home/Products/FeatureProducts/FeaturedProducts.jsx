@@ -35,10 +35,10 @@ const FeaturedProducts = () => {
         }));
         
         // Chỉ lấy 8 sản phẩm đầu tiên
-        setProducts(transformedProducts.slice(0, 8)); 
+        setProducts(transformedProducts.slice(0, 8));
         
       } catch (error) {
-        console.error("Lỗi fetch sản phẩm mới:", error);
+        // Silent error handling
       } finally {
         setIsLoading(false);
       }

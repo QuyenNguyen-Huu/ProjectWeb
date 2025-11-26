@@ -223,12 +223,6 @@ export default function useProducts() {
                 const res = await apiClient.getProducts(apiParams);
                 let productsFromApi = Array.isArray(res) ? res : (res?.items || []);
 
-                console.log("🚀 API Response:", {
-                    count: productsFromApi.length,
-                    firstProductRaw: productsFromApi[0],
-                    hasNameEn: !!productsFromApi[0]?.name_en
-                });
-
                 // Chuẩn hóa field ảnh để ProductCard nhận đúng prop `images`
                 let transformedProducts = productsFromApi.map(p => ({
                     ...p, // Giữ lại tất cả data gốc (id, name, slug, price, sizes...)
@@ -240,12 +234,6 @@ export default function useProducts() {
                     images: p.images_card || [], // Đảm bảo 'images' lấy từ 'images_card'
                 }));
                 
-                console.log("🔄 Transformed Products:", {
-                    count: transformedProducts.length,
-                    firstTransformed: transformedProducts[0],
-                    hasProductField: !!transformedProducts[0]?.product
-                });
-
                 // --- 3. LỌC Ở CLIENT (TOÀN BỘ) ---
                 // BƯỚC 3.1: Lọc theo Category PHỤ (Nam/Nữ, Road/Trail)
                 transformedProducts = filterBySubCategory(transformedProducts, subCategory);
@@ -309,8 +297,7 @@ export default function useProducts() {
                 setCurrentProducts(productsForCurrentPage);
 
             } catch (error) {
-                console.error("Không thể fetch sản phẩm:", error.message);
-                setAllProducts([]);
+                setProducts([]);
                 setCurrentProducts([]);
             } finally {
                 const timer = setTimeout(() => setIsLoading(false), 300);

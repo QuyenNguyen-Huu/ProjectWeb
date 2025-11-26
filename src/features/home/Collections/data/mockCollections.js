@@ -4413,7 +4413,7 @@ const mockCollections = [
                 isNew: true,
                 isGift: false,
             },
-            , {
+            {
                 id: 1,
                 title: "Áo Chạy Địa Hình Nam Raidlight Maillot de trail R-Light - KAKI",
                 href: "/ao-chay-dia-hinh-nam-raidlight-maillot-de-trail-rlight-kaki-p39112612.html",

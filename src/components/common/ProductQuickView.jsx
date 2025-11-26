@@ -1,72 +1,99 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // --- THÊM IMPORT ---
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/cartContext'; // Import hook giỏ hàng
 import { useLanguage } from '@/context/LanguageContext';
 import { formatCurrency } from '@/utils/formatCurrency';
 
-const SIZES_MOCK = ["36", "37.5", "38", "38 2/3", "39 1/3", "40", "40 2/3", "41 1/3"];
-
 const ProductQuickView = ({ product, onClose }) => {
-    console.log("Kiểm tra product", product);
     const [selectedSize, setSelectedSize] = useState(null);
     const [quantity, setQuantity] = useState(1);
 
-    // --- THÊM HOOKS ---
     const { addToCart } = useCart();
-    const navigate = useNavigate(); // Hook để điều hướng
-    const { t } = useLanguage();
+    const navigate = useNavigate();
+    const { t, language } = useLanguage();
+
+    // Lấy sizes từ product, fallback về array rỗng nếu không có
+    const availableSizes = product?.product?.sizes || product?.sizes || [];
+
+    // ESC key để đóng modal
+    useEffect(() => {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleEscape);
+        return () => window.removeEventListener('keydown', handleEscape);
+    }, [onClose]);
 
     const handleOverlayClick = (e) => {
-        if (e.target === e.currentTarget) onClose();
-    };
-
-    const handleQuantityChange = (e) => {
-        const value = e.target.value;
-        if (/^[1-9]\d*$/.test(value) || value === "") {
-            setQuantity(value ? parseInt(value) : 1);
+        if (e.target === e.currentTarget) {
+            onClose();
         }
     };
 
-    // --- THÊM HÀM MỚI ---
-    const handleAddToCart = () => {
-        // 1. Tạo đối tượng 'item' để thêm vào giỏ
-        // (Phải khớp với cấu trúc mà CartPage đang dùng)
+    const handleQuantityIncrease = () => {
+        setQuantity(prev => prev + 1);
+    };
+
+    const handleQuantityDecrease = () => {
+        if (quantity > 1) {
+            setQuantity(prev => prev - 1);
+        }
+    };
+
+    const handleAddToCart = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!selectedSize) {
+            alert(language === 'vi' ? 'Vui lòng chọn size!' : 'Please select a size!');
+            return;
+        }
+        
+        const productName = language === 'en' && product.product?.name_en 
+            ? product.product.name_en 
+            : product.title;
+        
         const itemToAdd = {
-            id: product.id || "SP001",
-            name: product.title,
+            id: product.id || product.product?.id || "SP001",
+            name: productName,
+            name_vi: product.title,
+            name_en: product.product?.name_en || product.title,
             price: product.price,
-            image: product.images?.[0], // Lấy ảnh đầu tiên
+            image: product.images?.[0],
             size: selectedSize,
-            quantity: quantity,      // Lấy số lượng từ state
-            href: product.href       // Thêm href để dùng trong CartPage
+            quantity: quantity,
+            href: product.href
         };
         
-        // 2. Gọi hàm từ context
         addToCart(itemToAdd);
-
-        // 3. (Yêu cầu 1) Chuyển hướng đến trang giỏ hàng
-        // Thay '/cart' bằng route giỏ hàng của bạn
-        navigate('/cart'); 
+        alert(language === 'vi' 
+            ? `Đã thêm ${productName} vào giỏ hàng!` 
+            : `Added ${productName} to cart!`
+        );
+        onClose();
     };
-    // --- KẾT THÚC HÀM MỚI ---
 
     if (!product) return null;
 
     return (
         <div
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100000] p-4"
             onClick={handleOverlayClick}
         >
             <div
-                className="bg-white rounded-lg max-w-4xl w-full relative shadow-2xl transform transition-all duration-300 scale-100 animate-zoomIn"
+                className="bg-white rounded-lg max-w-4xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Close button (giữ nguyên) */}
+                {/* Close button */}
                 <button
+                    type="button"
                     onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition"
+                    className="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition z-10 bg-white rounded-full p-1 shadow-md cursor-pointer"
                     aria-label={t('common.close')}
+                    title="Đóng (ESC)"
                 >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -88,10 +115,10 @@ const ProductQuickView = ({ product, onClose }) => {
                     <div className="p-8 flex flex-col gap-4">
                         <a
                             href={product.href}
-                            title={product.title}
-                            className="text-2xl font-bold !text-gray-900 hover:!text-purple-600 transition-colors"
+                            title={language === 'en' && product.product?.name_en ? product.product.name_en : product.title}
+                            className="text-2xl font-bold text-gray-900 hover:text-purple-600 transition-colors"
                         >
-                            {product.title}
+                            {language === 'en' && product.product?.name_en ? product.product.name_en : product.title}
                         </a>
 
                         <p className="text-sm text-gray-500">
@@ -106,43 +133,66 @@ const ProductQuickView = ({ product, onClose }) => {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">{t('product.filter.size')}:</label>
                             <div className="flex flex-wrap gap-2">
-                                {SIZES_MOCK.map((size) => (
-                                    <button
-                                        key={size}
-                                        onClick={() => setSelectedSize(size)}
-                                        className={`px-4 py-2 rounded border text-sm ${
-                                            selectedSize === size
-                                                ? "border-orange-500 ring-2 ring-orange-200 bg-orange-50"
-                                                : "border-gray-300 hover:border-orange-400"
-                                        } transition-all`}
-                                    >
-                                        {size}
-                                    </button>
-                                ))}
+                                {availableSizes.length > 0 ? (
+                                    availableSizes.map((size) => (
+                                        <button
+                                            key={size}
+                                            onClick={() => setSelectedSize(size)}
+                                            className={`px-4 py-2 rounded border text-sm ${
+                                                selectedSize === size
+                                                    ? "border-orange-500 ring-2 ring-orange-200 bg-orange-50"
+                                                    : "border-gray-300 hover:border-orange-400"
+                                            } transition-all`}
+                                        >
+                                            {size}
+                                        </button>
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-gray-500">{language === 'vi' ? 'Không có size' : 'No sizes available'}</p>
+                                )}
                             </div>
                         </div>
 
                         {/* Số lượng & Thêm giỏ hàng */}
                         <div className="flex items-center gap-4 mt-4">
-                            <input
-                                type="number"
-                                value={quantity}
-                                onChange={handleQuantityChange}
-                                min="1"
-                                className="w-20 border border-gray-300 rounded p-2 text-center focus:outline-none focus:ring-2 focus:ring-purple-300"
-                                onKeyPress={(e) => !/[0-9]/.test(e.key) && e.preventDefault()}
-                            />
+                            <div className="relative w-20">
+                                <input
+                                    type="text"
+                                    readOnly
+                                    value={quantity}
+                                    className="w-full h-12 text-center border border-gray-300 rounded-full pr-6 outline-none"
+                                />
+                                <div className="absolute right-1 top-0 h-full flex flex-col justify-center">
+                                    <button
+                                        type="button"
+                                        onClick={handleQuantityIncrease}
+                                        className="text-gray-600 h-1/2 flex items-center justify-center px-1 hover:text-purple-600 transition cursor-pointer"
+                                    >
+                                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 448 512">
+                                            <path d="M201.4 137.4c12.5-12.5 32.8-12.5 45.3 0l160 160c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L224 205.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l160-160z"/>
+                                        </svg>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleQuantityDecrease}
+                                        disabled={quantity <= 1}
+                                        className="text-gray-600 h-1/2 flex items-center justify-center px-1 hover:text-purple-600 transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                                    >
+                                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 448 512">
+                                            <path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 351.3 86.6 214.6c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
                             
-                            {/* --- SỬA NÚT BẤM --- */}
                             <button
+                                type="button"
                                 onClick={handleAddToCart}
-                                disabled={!selectedSize} // (Yêu cầu 2) Disable khi chưa chọn size
-                                className="flex-1 bg-purple-600 text-white font-bold py-3 px-6 rounded-md hover:bg-purple-700 transition-colors 
-                                           disabled:bg-gray-400 disabled:cursor-not-allowed" // Thêm style cho 'disabled'
+                                disabled={!selectedSize}
+                                className="flex-1 bg-purple-600 text-white font-bold py-3 px-6 rounded-md hover:bg-purple-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
                             >
                                 {t('product.detail.addToCartBtn')}
                             </button>
-                            {/* --- KẾT THÚC SỬA NÚT BẤM --- */}
                         </div>
                     </div>
                 </div>

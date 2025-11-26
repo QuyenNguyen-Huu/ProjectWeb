@@ -17,19 +17,8 @@ const ProductCard = ({
 }) => {
   const { t, language } = useLanguage();
   
-  // Debug: kiểm tra xem product có được truyền không
-  console.log("🔍 ProductCard Debug:", {
-    hasProduct: !!product,
-    productName: product?.name,
-    productNameEn: product?.name_en,
-    title: title,
-    language: language
-  });
-  
   // Lấy tên hiển thị: ưu tiên dùng t(product, 'name') nếu có product object
   const displayTitle = product ? t(product, 'name') : title;
-  
-  console.log("📌 displayTitle:", displayTitle);
   
   // State điều khiển hiển thị popup
   const [quickViewProduct, setQuickViewProduct] = useState(null);
@@ -39,11 +28,9 @@ const ProductCard = ({
     e.preventDefault();
     e.stopPropagation();
 
-    console.log("1. [ProductCard] ĐÃ CLICK ICON ZOOM!");
-
-    // Gán sản phẩm đang xem nhanh
-    console.log("2. [ProductCard] Đang mở popup xem nhanh...");
+    // Gán sản phẩm đang xem nhanh - THÊM product object để có name_en
     setQuickViewProduct({
+      id: product?.id || id,
       title,
       href,
       images,
@@ -52,6 +39,7 @@ const ProductCard = ({
       salePercent,
       isNew,
       isGift,
+      product: product, // Thêm product object gốc để lấy name_en
     });
   };
 

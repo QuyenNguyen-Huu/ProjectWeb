@@ -9,17 +9,20 @@ import { ChevronLeft, ChevronUp, ChevronDown } from 'lucide-react';
 
 // Helper: Parse tên sản phẩm từ tiếng Anh sang tiếng Việt (fallback)
 const getDisplayName = (item, language) => {
-    // Nếu có name_en, dùng nó
+    // Nếu có name_vi và name_en, dùng theo language
+    if (item.name_vi && item.name_en) {
+        return language === 'en' ? item.name_en : item.name_vi;
+    }
+    
+    // Fallback: nếu có name_en
     if (item.name_en) {
         return language === 'en' ? item.name_en : item.name;
     }
     
-    // Nếu không có name_en, kiểm tra xem item.name có phải tiếng Anh không
-    // (tạm thời giải pháp: nếu name bắt đầu bằng chữ in hoa tiếng Anh thì coi như là EN)
+    // Fallback cũ: kiểm tra xem item.name có phải tiếng Anh không
     const isEnglishName = /^[A-Z]/.test(item.name);
     
     if (isEnglishName && language === 'vi') {
-        // Trả về message cho user biết cần cập nhật
         return item.name + ' (⚠️ Vui lòng xóa và thêm lại vào giỏ)';
     }
     
@@ -75,7 +78,7 @@ const CartItemRow = ({ item }) => {
             </td>
             <td className="p-4 text-center uppercase">
                 <Link
-                    to={`/${item.id}.html`}
+                    to={item.href || `/${item.id}.html`}
                     className="hover:text-purple-600 cursor-pointer"
                 >
                     {displayName}
@@ -179,7 +182,7 @@ const CartItemRowMobile = ({ item }) => {
             <div className="flex-1">
                 <p className="font-semibold uppercase">
                     <Link
-                        to={`/${item.id}.html`}
+                        to={item.href || `/${item.id}.html`}
                         className="hover:text-purple-600 cursor-pointer"
                     >
                         {displayName}
