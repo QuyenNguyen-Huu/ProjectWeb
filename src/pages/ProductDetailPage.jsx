@@ -16,6 +16,8 @@ import {  getClothingSizeChartHTML, getShoesSizeChartHTML } from '@/data/product
 import ProductCarousel from '@/components/common/ProductCarousel';
 import ProductCard from '@/components/common/ProductCard';
 import { useLanguage } from "@/context/LanguageContext";
+// Import track category sản phẩm
+import { trackViewedProduct } from '@/utils/recommendationHelpers';
 
 // --- Cấu hình Zoom ---
 const LENS_SIZE = 180;
@@ -126,6 +128,7 @@ export default function ProductDetailPage() {
 
                 // 2. Fetch sản phẩm liên quan (Sau khi đã có category của sản phẩm chính)
                 if (productData && productData.category) {
+                    trackViewedProduct(productData); // Track
                     const relatedData = await apiClient.getProducts({ 
                         category: productData.category
                     });
@@ -146,7 +149,6 @@ export default function ProductDetailPage() {
                     );
                 }
 
-                // --- Logic cũ (giữ nguyên, nhưng dùng productData) ---
                 window.scrollTo(0, 0);
                 
                 const cleanedName = productData.name; 
