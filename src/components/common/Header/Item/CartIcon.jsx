@@ -6,28 +6,25 @@ import { useCart } from '@/context/cartContext';
 
 
 const CartIcon = () => {
-    // 3. Lấy dữ liệu từ Context
-    const { cartItems } = useCart();
-
-    // 4. TÍNH TỔNG SỐ LƯỢNG 
-    
-    const totalItems = cartItems.length;
+    const { cartItems } = useCart(); // Lấy dữ liệu
+    const totalItems = cartItems.length; // Tính tổng
 
     return (
-        <li>
-            
-            <Link to="/cart" className="relative inline-block p-2">
+        // Thêm flex để căn giữa theo chiều dọc nếu li có chiều cao khác các phần tử khác
+        <li className="flex items-center"> 
+            <Link to="/cart" className="relative inline-block p-2 text-xl hover:text-orange-500 transition-colors">
                 <div className="inline-block">
-                    
                     <i aria-hidden="true" className="fa fa-shopping-bag"></i>
                 </div>
 
-                <span 
-                    className="cart-count absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center" 
-                    id="cart-total"
-                >
-                    {totalItems}
-                </span>
+                {totalItems > 0 && (
+                    <span 
+                        className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border border-white" 
+                        id="cart-total"
+                    >
+                        {totalItems}
+                    </span>
+                )}
             </Link>
         </li>
     )

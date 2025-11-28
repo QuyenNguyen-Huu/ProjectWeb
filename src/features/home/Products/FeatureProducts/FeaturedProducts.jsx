@@ -18,27 +18,26 @@ const FeaturedProducts = () => {
     const fetchNewProducts = async () => {
       setIsLoading(true);
       try {
-        // Gọi API, sắp xếp theo 'new' (sản phẩm mới nhất)
+        // Gọi API, sắp xếp theo 'new'
         const apiProducts = await apiClient.getProducts({ show: 'new' });
         
         // Chuyển đổi dữ liệu API để truyền vào ProductCard
         const transformedProducts = apiProducts.map(p => ({
             id: p.id,
-            product: p, // Truyền toàn bộ product object để dùng với t()
-            title: p.name, // Giữ lại title để backward compatible
+            product: p,
+            title: p.name,
             href: `/${p.slug}.html`,
             images: p.images_card,
             price: p.price,
             oldPrice: p.oldPrice,
             salePercent: p.salePercent,
-            isNew: !p.oldPrice // Gắn tag "Best Seller" (hoặc "New") nếu không sale
+            isNew: !p.oldPrice
         }));
         
         // Chỉ lấy 8 sản phẩm đầu tiên
         setProducts(transformedProducts.slice(0, 8));
         
       } catch (error) {
-        // Silent error handling
       } finally {
         setIsLoading(false);
       }

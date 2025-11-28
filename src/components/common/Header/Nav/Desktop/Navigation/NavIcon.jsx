@@ -1,35 +1,38 @@
+// src/layouts/Header/Nav/Navigation/NavIcon.jsx
 import React from 'react'
 import CartIcon from '../../../Item/CartIcon'
 import UserIcon from '../../../Item/UserIcon'
 import { useLanguage } from '@/context/LanguageContext';
 
-// Ngọc làm
-const NavIcon = () => {
+// BƯỚC 4: Nhận prop toggleForm từ cha truyền xuống
+const NavIcon = ({ toggleForm }) => {
     const { t, switchLanguage, language } = useLanguage();
+
     return (
         <div className="sidebar-icon-nav">
-            <ul className="nav-list">
+            <ul className="nav-list flex items-center gap-4">
+                
+                {/* --- Chuyển Form thành Button Trigger --- */}
                 <li>
-                    <form role="search" className='form'>
-                        <input
-                            className=""
-                            name="q"
-                            type="search"
-                            placeholder={t("common.searchPlaceholder")}
-                            id="text-search"
-                        />
-                        <button type="submit" className="form-button">
-                            <i aria-hidden="true" className="fa fa-search"></i>
-                        </button>
-                    </form>
+                    <button 
+                        type="button" 
+                        onClick={toggleForm} // mở GlobalSearch
+                        className="cursor-pointer hover:text-orange-500 transition-colors"
+                        title={t("common.searchPlaceholder")}
+                    >
+                        {/* Icon kính lúp */}
+                        <i aria-hidden="true" className="fa fa-search text-xl"></i>
+                    </button>
                 </li>
+                {/* ------------------------------------------------ */}
 
                 <UserIcon />
 
                 <CartIcon />
 
-                <li className="language">
-                    <span className="flex">
+                {/* Phần Language Switcher giữ nguyên */}
+                <li className="language ml-2">
+                    <span className="flex items-center">
                         <button 
                             className={`trans cursor-pointer ${language === 'vi' ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
                             onClick={() => switchLanguage('vi')}

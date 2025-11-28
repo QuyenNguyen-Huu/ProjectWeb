@@ -8,26 +8,13 @@ const NavIcon = ({ toggleForm, showForm, closing }) => {
     return (
         <div className="sidebar-icon-nav">
             <ul className="nav-list">
-                <li>
-                    <a onClick={toggleForm}>
+                <li className="flex items-center">
+                    <button 
+                        onClick={toggleForm} 
+                        className="p-2 text-xl text-gray-800 hover:text-orange-500 transition-colors focus:outline-none"
+                    >
                         <i aria-hidden="true" className="fa fa-search"></i>
-                    </a>
-                    {(showForm || closing) && (
-                        <div className={`absolute w-[75%] right-0 mt-1.5 ${showForm ? 'warp-open' : 'warp-close'}`}>
-                            <form role="search" className="relative mb-2.5 border-t border-gray-300">
-                                <input
-                                    className="bg-[#ebebeb] w-full px-2.5 py-1"
-                                    name="q"
-                                    type="search"
-                                    placeholder={t('common.searchPlaceholder')}
-                                    id="text-search"
-                                />
-                                <button type="submit" className="form-button">
-                                    <i aria-hidden="true" className="fa fa-search"></i>
-                                </button>
-                            </form>
-                        </div>
-                    )}
+                    </button>
                 </li>
                 <CartIcon />
                 <li className="language flex items-center">

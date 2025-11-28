@@ -7,6 +7,7 @@ import MobileNav from './Nav/Mobile/MobileNav';
 import DesktopNav from './Nav/Desktop/DesktopNav';
 import './css/NavIconLogo.css';
 import './css/NavBar.css';
+import GlobalSearch from '@/components/common/GlobalSearch';
 
 
 export default function Header() {
@@ -35,19 +36,31 @@ export default function Header() {
             setClosing(false)
         }
     };
+
+    // Hàm đóng form cưỡng bức (truyền xuống GlobalSearch)
+    const closeForm = () => {
+        setClosing(true);
+        setTimeout(() => {
+            setShowForm(false);
+            setClosing(false);
+        }, 300);
+    }
+
     const scrollClass = show ? "translate-y-0" : "-translate-y-full";
 
     return (
-        <header className={`header ${scrollClass}`}>
+        // QUAN TRỌNG: relative để GlobalSearch absolute theo thằng này
+        <header className={`header ${scrollClass} relative bg-white shadow-sm z-[100]`}> 
             <div className="container-main">
                 {!isDesktop ? (
-                    <MobileNav toggleForm={toggleForm} showForm={showForm} closing={closing} />
-
+                    <MobileNav toggleForm={toggleForm} showForm={showForm} />
                 ) : (
-                    // BƯỚC 4: Truyền tín hiệu "hideNavBar" xuống DesktopNav
-                    <DesktopNav hideNavBar={isProductsPage} />
+                    <DesktopNav hideNavBar={isProductsPage} toggleForm={toggleForm} />
                 )}
             </div>
+            {showForm && (
+                <GlobalSearch onClose={closeForm} />
+            )}
         </header>
     )
 }
