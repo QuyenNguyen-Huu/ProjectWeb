@@ -92,13 +92,15 @@ export const resources = {
       saleProducts: "Sản phẩm Sale Off",
       relatedProducts: "Sản phẩm liên quan",
       teamAlbum: "Album hoạt động team",
+      recommendedForYou: "Gợi ý cho bạn",
+      hotProducts: "Xu hướng tìm kiếm",
       policies: {
         freeShip: "MIỄN PHÍ VẬN CHUYỂN",
         billCondition: "(BILL > 1M)",
         return7Days: "ĐỔI TRẢ TRONG VÒNG 7 NGÀY",
         experience: "SẢN PHẨM TRẢI NGHIỆM",
         storeAvailable: "SẴN TẠI STORE"
-      }
+      },
     },
 
     // 5. Product & Category
@@ -372,6 +374,8 @@ export const resources = {
       saleProducts: "Sale Off Products",
       relatedProducts: "Related Products",
       teamAlbum: "Team Activities Album",
+      recommendedForYou: "Recommended For You",
+      hotProducts: "Hot Products",
       policies: {
         freeShip: "FREE SHIPPING",
         billCondition: "(BILL > 1M)",
